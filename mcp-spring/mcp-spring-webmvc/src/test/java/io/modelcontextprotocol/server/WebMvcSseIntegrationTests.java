@@ -166,8 +166,8 @@ class WebMvcSseIntegrationTests {
 					CreateMessageResult.StopReason.STOP_SEQUENCE);
 		};
 
-		CallToolResult callResponse = new McpSchema.CallToolResult(List.of(new McpSchema.TextContent("CALL RESPONSE")),
-				null);
+		List<McpSchema.Content> contentList = Collections.singletonList(new McpSchema.TextContent("CALL RESPONSE"));
+		CallToolResult callResponse = new McpSchema.CallToolResult(contentList, null);
 
 		McpServerFeatures.AsyncToolSpecification tool = new McpServerFeatures.AsyncToolSpecification(
 				new McpSchema.Tool("tool1", "tool1 description", emptyJsonSchema), (exchange, request) -> {
