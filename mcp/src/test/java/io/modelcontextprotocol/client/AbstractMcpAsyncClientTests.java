@@ -5,6 +5,7 @@
 package io.modelcontextprotocol.client;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -168,14 +169,18 @@ public abstract class AbstractMcpAsyncClientTests {
 
 	@Test
 	void testCallToolWithoutInitialization() {
-		CallToolRequest callToolRequest = new CallToolRequest("echo", Map.of("message", ECHO_TEST_MESSAGE));
+		Map<String, Object> params = new HashMap<>();
+		params.put("message", ECHO_TEST_MESSAGE);
+		CallToolRequest callToolRequest = new CallToolRequest("echo", params);
 		verifyInitializationTimeout(client -> client.callTool(callToolRequest), "calling tools");
 	}
 
 	@Test
 	void testCallTool() {
 		withClient(createMcpTransport(), mcpAsyncClient -> {
-			CallToolRequest callToolRequest = new CallToolRequest("echo", Map.of("message", ECHO_TEST_MESSAGE));
+			Map<String, Object> params = new HashMap<>();
+			params.put("message", ECHO_TEST_MESSAGE);
+			CallToolRequest callToolRequest = new CallToolRequest("echo", params);
 
 			StepVerifier.create(mcpAsyncClient.initialize().then(mcpAsyncClient.callTool(callToolRequest)))
 				.consumeNextWith(callToolResult -> {
@@ -191,8 +196,9 @@ public abstract class AbstractMcpAsyncClientTests {
 	@Test
 	void testCallToolWithInvalidTool() {
 		withClient(createMcpTransport(), mcpAsyncClient -> {
-			CallToolRequest invalidRequest = new CallToolRequest("nonexistent_tool",
-					Map.of("message", ECHO_TEST_MESSAGE));
+			Map<String, Object> params = new HashMap<>();
+			params.put("message", ECHO_TEST_MESSAGE);
+			CallToolRequest invalidRequest = new CallToolRequest("nonexistent_tool", params);
 
 			StepVerifier.create(mcpAsyncClient.initialize().then(mcpAsyncClient.callTool(invalidRequest)))
 				.consumeErrorWith(
@@ -258,16 +264,18 @@ public abstract class AbstractMcpAsyncClientTests {
 
 	@Test
 	void testGetPromptWithoutInitialization() {
-		GetPromptRequest request = new GetPromptRequest("simple_prompt", Map.of());
+		Map<String, Object> emptyParams = new HashMap<>();
+		GetPromptRequest request = new GetPromptRequest("simple_prompt", emptyParams);
 		verifyInitializationTimeout(client -> client.getPrompt(request), "getting " + "prompts");
 	}
 
 	@Test
 	void testGetPrompt() {
 		withClient(createMcpTransport(), mcpAsyncClient -> {
+			Map<String, Object> emptyParams = new HashMap<>();
 			StepVerifier
 				.create(mcpAsyncClient.initialize()
-					.then(mcpAsyncClient.getPrompt(new GetPromptRequest("simple_prompt", Map.of()))))
+					.then(mcpAsyncClient.getPrompt(new GetPromptRequest("simple_prompt", emptyParams))))
 				.consumeNextWith(prompt -> {
 					assertThat(prompt).isNotNull().satisfies(result -> {
 						assertThat(result.messages()).isNotEmpty();
@@ -424,8 +432,10 @@ public abstract class AbstractMcpAsyncClientTests {
 
 	@Test
 	void testInitializeWithAllCapabilities() {
-		var capabilities = ClientCapabilities.builder()
-			.experimental(Map.of("feature", "test"))
+		Map<String, Object> experimentalFeatures = new HashMap<>();
+		experimentalFeatures.put("feature", "test");
+		ClientCapabilities capabilities = ClientCapabilities.builder()
+			.experimental(experimentalFeatures)
 			.roots(true)
 			.sampling()
 			.build();
