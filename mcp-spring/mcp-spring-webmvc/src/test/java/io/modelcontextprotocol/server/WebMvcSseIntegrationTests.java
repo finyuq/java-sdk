@@ -4,6 +4,9 @@
 package io.modelcontextprotocol.server;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -126,14 +129,14 @@ class WebMvcSseIntegrationTests {
 				});
 
 		//@formatter:off
-		var server = McpServer.async(mcpServerTransportProvider)
+		McpServer server = McpServer.async(mcpServerTransportProvider)
 				.serverInfo("test-server", "1.0.0")
 				.tools(tool)
 				.build();
 		
 		try (
 			// Create client without sampling capabilities
-			var client = clientBuilder
+			McpClient client = clientBuilder
 				.clientInfo(new McpSchema.Implementation("Sample " + "client", "0.0.0"))
 				.build()) {//@formatter:on
 
@@ -217,15 +220,15 @@ class WebMvcSseIntegrationTests {
 	// ---------------------------------------
 	@Test
 	void testRootsSuccess() {
-		List<Root> roots = List.of(new Root("uri1://", "root1"), new Root("uri2://", "root2"));
+		List<Root> roots = Arrays.asList(new Root("uri1://", "root1"), new Root("uri2://", "root2"));
 
 		AtomicReference<List<Root>> rootsRef = new AtomicReference<>();
 
-		var mcpServer = McpServer.sync(mcpServerTransportProvider)
+		McpServer mcpServer = McpServer.sync(mcpServerTransportProvider)
 			.rootsChangeHandler((exchange, rootsUpdate) -> rootsRef.set(rootsUpdate))
 			.build();
 
-		try (var mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().roots(true).build())
+		try (McpClient mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().roots(true).build())
 			.roots(roots)
 			.build()) {
 
@@ -244,15 +247,19 @@ class WebMvcSseIntegrationTests {
 			mcpClient.removeRoot(roots.get(0).uri());
 
 			await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-				assertThat(rootsRef.get()).containsAll(List.of(roots.get(1)));
+				List<Root> expectedRoots = Arrays.asList(roots.get(1));
+				assertThat(rootsRef.get()).containsAll(expectedRoots);
 			});
 
 			// Add a new root
-			var root3 = new Root("uri3://", "root3");
+			Root root3 = new Root("uri3://", "root3");
 			mcpClient.addRoot(root3);
 
 			await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-				assertThat(rootsRef.get()).containsAll(List.of(roots.get(1), root3));
+				List<Root> expectedRoots = new ArrayList<>();
+				expectedRoots.add(roots.get(1));
+				expectedRoots.add(root3);
+				assertThat(rootsRef.get()).containsAll(expectedRoots);
 			});
 		}
 
@@ -270,19 +277,20 @@ class WebMvcSseIntegrationTests {
 					return mock(CallToolResult.class);
 				});
 
-		var mcpServer = McpServer.sync(mcpServerTransportProvider).rootsChangeHandler((exchange, rootsUpdate) -> {
+		McpServer mcpServer = McpServer.sync(mcpServerTransportProvider).rootsChangeHandler((exchange, rootsUpdate) -> {
 		}).tools(tool).build();
 
 		try (
 				// Create client without roots capability
 				// No roots capability
-				var mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().build()).build()) {
+				McpClient mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().build()).build()) {
 
 			assertThat(mcpClient.initialize()).isNotNull();
 
 			// Attempt to list roots should fail
 			try {
-				mcpClient.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+				Map<String, Object> emptyParams = new HashMap<>();
+				mcpClient.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 			}
 			catch (McpError e) {
 				assertThat(e).isInstanceOf(McpError.class).hasMessage("Roots not supported");
@@ -296,12 +304,12 @@ class WebMvcSseIntegrationTests {
 	void testRootsNotifciationWithEmptyRootsList() {
 		AtomicReference<List<Root>> rootsRef = new AtomicReference<>();
 
-		var mcpServer = McpServer.sync(mcpServerTransportProvider)
+		McpServer mcpServer = McpServer.sync(mcpServerTransportProvider)
 			.rootsChangeHandler((exchange, rootsUpdate) -> rootsRef.set(rootsUpdate))
 			.build();
 
-		try (var mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().roots(true).build())
-			.roots(List.of()) // Empty roots list
+		try (McpClient mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().roots(true).build())
+			.roots(new ArrayList<>()) // Empty roots list
 			.build()) {
 
 			InitializeResult initResult = mcpClient.initialize();
@@ -319,17 +327,17 @@ class WebMvcSseIntegrationTests {
 
 	@Test
 	void testRootsWithMultipleHandlers() {
-		List<Root> roots = List.of(new Root("uri1://", "root1"));
+		List<Root> roots = Arrays.asList(new Root("uri1://", "root1"));
 
 		AtomicReference<List<Root>> rootsRef1 = new AtomicReference<>();
 		AtomicReference<List<Root>> rootsRef2 = new AtomicReference<>();
 
-		var mcpServer = McpServer.sync(mcpServerTransportProvider)
+		McpServer mcpServer = McpServer.sync(mcpServerTransportProvider)
 			.rootsChangeHandler((exchange, rootsUpdate) -> rootsRef1.set(rootsUpdate))
 			.rootsChangeHandler((exchange, rootsUpdate) -> rootsRef2.set(rootsUpdate))
 			.build();
 
-		try (var mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().roots(true).build())
+		try (McpClient mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().roots(true).build())
 			.roots(roots)
 			.build()) {
 
@@ -348,15 +356,15 @@ class WebMvcSseIntegrationTests {
 
 	@Test
 	void testRootsServerCloseWithActiveSubscription() {
-		List<Root> roots = List.of(new Root("uri1://", "root1"));
+		List<Root> roots = Arrays.asList(new Root("uri1://", "root1"));
 
 		AtomicReference<List<Root>> rootsRef = new AtomicReference<>();
 
-		var mcpServer = McpServer.sync(mcpServerTransportProvider)
+		McpServer mcpServer = McpServer.sync(mcpServerTransportProvider)
 			.rootsChangeHandler((exchange, rootsUpdate) -> rootsRef.set(rootsUpdate))
 			.build();
 
-		try (var mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().roots(true).build())
+		try (McpClient mcpClient = clientBuilder.capabilities(ClientCapabilities.builder().roots(true).build())
 			.roots(roots)
 			.build()) {
 
@@ -377,18 +385,19 @@ class WebMvcSseIntegrationTests {
 	// Tools Tests
 	// ---------------------------------------
 
-	String emptyJsonSchema = """
-			{
-				"$schema": "http://json-schema.org/draft-07/schema#",
-				"type": "object",
-				"properties": {}
-			}
-			""";
+	String emptyJsonSchema = "{\n" +
+			"\t\"$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
+			"\t\"type\": \"object\",\n" +
+			"\t\"properties\": {}\n" +
+			"}";
 
 	@Test
 	void testToolCallSuccess() {
 
-		var callResponse = new McpSchema.CallToolResult(List.of(new McpSchema.TextContent("CALL RESPONSE")), null);
+		List<McpSchema.TextContent> contentList = new ArrayList<>();
+		contentList.add(new McpSchema.TextContent("CALL RESPONSE"));
+		McpSchema.CallToolResult callResponse = new McpSchema.CallToolResult(contentList, null);
+		
 		McpServerFeatures.SyncToolSpecification tool1 = new McpServerFeatures.SyncToolSpecification(
 				new McpSchema.Tool("tool1", "tool1 description", emptyJsonSchema), (exchange, request) -> {
 					// perform a blocking call to a remote service
@@ -401,19 +410,20 @@ class WebMvcSseIntegrationTests {
 					return callResponse;
 				});
 
-		var mcpServer = McpServer.sync(mcpServerTransportProvider)
+		McpServer mcpServer = McpServer.sync(mcpServerTransportProvider)
 			.capabilities(ServerCapabilities.builder().tools(true).build())
 			.tools(tool1)
 			.build();
 
-		try (var mcpClient = clientBuilder.build()) {
+		try (McpClient mcpClient = clientBuilder.build()) {
 
 			InitializeResult initResult = mcpClient.initialize();
 			assertThat(initResult).isNotNull();
 
 			assertThat(mcpClient.listTools().tools()).contains(tool1.tool());
 
-			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+			Map<String, Object> emptyParams = new HashMap<>();
+			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 
 			assertThat(response).isNotNull().isEqualTo(callResponse);
 		}
@@ -424,7 +434,10 @@ class WebMvcSseIntegrationTests {
 	@Test
 	void testToolListChangeHandlingSuccess() {
 
-		var callResponse = new McpSchema.CallToolResult(List.of(new McpSchema.TextContent("CALL RESPONSE")), null);
+		List<McpSchema.TextContent> contentList = new ArrayList<>();
+		contentList.add(new McpSchema.TextContent("CALL RESPONSE"));
+		McpSchema.CallToolResult callResponse = new McpSchema.CallToolResult(contentList, null);
+		
 		McpServerFeatures.SyncToolSpecification tool1 = new McpServerFeatures.SyncToolSpecification(
 				new McpSchema.Tool("tool1", "tool1 description", emptyJsonSchema), (exchange, request) -> {
 					// perform a blocking call to a remote service
@@ -439,12 +452,12 @@ class WebMvcSseIntegrationTests {
 
 		AtomicReference<List<Tool>> rootsRef = new AtomicReference<>();
 
-		var mcpServer = McpServer.sync(mcpServerTransportProvider)
+		McpServer mcpServer = McpServer.sync(mcpServerTransportProvider)
 			.capabilities(ServerCapabilities.builder().tools(true).build())
 			.tools(tool1)
 			.build();
 
-		try (var mcpClient = clientBuilder.toolsChangeConsumer(toolsUpdate -> {
+		try (McpClient mcpClient = clientBuilder.toolsChangeConsumer(toolsUpdate -> {
 			// perform a blocking call to a remote service
 			String response = RestClient.create()
 				.get()
@@ -465,7 +478,9 @@ class WebMvcSseIntegrationTests {
 			mcpServer.notifyToolsListChanged();
 
 			await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-				assertThat(rootsRef.get()).containsAll(List.of(tool1.tool()));
+				List<Tool> expectedTools = new ArrayList<>();
+				expectedTools.add(tool1.tool());
+				assertThat(rootsRef.get()).containsAll(expectedTools);
 			});
 
 			// Remove a tool
@@ -483,7 +498,9 @@ class WebMvcSseIntegrationTests {
 			mcpServer.addTool(tool2);
 
 			await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-				assertThat(rootsRef.get()).containsAll(List.of(tool2.tool()));
+				List<Tool> expectedTools = new ArrayList<>();
+				expectedTools.add(tool2.tool());
+				assertThat(rootsRef.get()).containsAll(expectedTools);
 			});
 		}
 
@@ -493,9 +510,9 @@ class WebMvcSseIntegrationTests {
 	@Test
 	void testInitialize() {
 
-		var mcpServer = McpServer.sync(mcpServerTransportProvider).build();
+		McpServer mcpServer = McpServer.sync(mcpServerTransportProvider).build();
 
-		try (var mcpClient = clientBuilder.build()) {
+		try (McpClient mcpClient = clientBuilder.build()) {
 
 			InitializeResult initResult = mcpClient.initialize();
 			assertThat(initResult).isNotNull();
