@@ -5,6 +5,9 @@ package io.modelcontextprotocol.server.transport;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -122,7 +125,8 @@ public class HttpServletSseServerTransportProviderIntegrationTests {
 			assertThat(client.initialize()).isNotNull();
 
 			try {
-				client.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+				Map<String, Object> emptyParams = new HashMap<>();
+				client.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 			}
 			catch (McpError e) {
 				assertThat(e).isInstanceOf(McpError.class)
@@ -185,7 +189,8 @@ public class HttpServletSseServerTransportProviderIntegrationTests {
 			InitializeResult initResult = mcpClient.initialize();
 			assertThat(initResult).isNotNull();
 
-			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+			Map<String, Object> emptyParams = new HashMap<>();
+			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 
 			assertThat(response).isNotNull();
 			assertThat(response).isEqualTo(callResponse);
@@ -260,7 +265,8 @@ public class HttpServletSseServerTransportProviderIntegrationTests {
 
 			// Attempt to list roots should fail
 			try {
-				mcpClient.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+				Map<String, Object> emptyParams = new HashMap<>();
+				mcpClient.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 			}
 			catch (McpError e) {
 				assertThat(e).isInstanceOf(McpError.class).hasMessage("Roots not supported");
@@ -390,7 +396,8 @@ public class HttpServletSseServerTransportProviderIntegrationTests {
 
 			assertThat(mcpClient.listTools().tools()).contains(tool1.tool());
 
-			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+			Map<String, Object> emptyParams = new HashMap<>();
+			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 
 			assertThat(response).isNotNull();
 			assertThat(response).isEqualTo(callResponse);
@@ -563,7 +570,8 @@ public class HttpServletSseServerTransportProviderIntegrationTests {
 			mcpClient.setLoggingLevel(McpSchema.LoggingLevel.NOTICE);
 
 			// Call the tool that sends logging notifications
-			CallToolResult result = mcpClient.callTool(new McpSchema.CallToolRequest("logging-test", Map.of()));
+			Map<String, Object> emptyParams = new HashMap<>();
+			CallToolResult result = mcpClient.callTool(new McpSchema.CallToolRequest("logging-test", emptyParams));
 			assertThat(result).isNotNull();
 			assertThat(result.content().get(0)).isInstanceOf(McpSchema.TextContent.class);
 			assertThat(((McpSchema.TextContent) result.content().get(0)).text()).isEqualTo("Logging test completed");
