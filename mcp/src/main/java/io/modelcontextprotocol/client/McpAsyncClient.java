@@ -5,6 +5,7 @@ package io.modelcontextprotocol.client;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +144,7 @@ public class McpAsyncClient {
 	/**
 	 * Supported protocol versions.
 	 */
-	private List<String> protocolVersions = List.of(McpSchema.LATEST_PROTOCOL_VERSION);
+	private List<String> protocolVersions = Collections.singletonList(McpSchema.LATEST_PROTOCOL_VERSION);
 
 	/**
 	 * Create a new McpAsyncClient with the given transport and session request-response
