@@ -1,6 +1,7 @@
 package io.modelcontextprotocol.spec;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -250,14 +251,60 @@ public class McpServerSession implements McpSession {
 		});
 	}
 
-	record MethodNotFoundError(String method, String message, Object data) {
+	static class MethodNotFoundError {
+		private final String method;
+		private final String message;
+		private final Object data;
+
+		public MethodNotFoundError(String method, String message, Object data) {
+			this.method = method;
+			this.message = message;
+			this.data = data;
+		}
+
+		public String method() {
+			return method;
+		}
+
+		public String message() {
+			return message;
+		}
+
+		public Object data() {
+			return data;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			MethodNotFoundError that = (MethodNotFoundError) o;
+			return java.util.Objects.equals(method, that.method) &&
+					java.util.Objects.equals(message, that.message) &&
+					java.util.Objects.equals(data, that.data);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(method, message, data);
+		}
+
+		@Override
+		public String toString() {
+			return "MethodNotFoundError{" +
+					"method='" + method + '\'' +
+					", message='" + message + '\'' +
+					", data=" + data +
+					'}';
+		}
 	}
 
 	static MethodNotFoundError getMethodNotFoundError(String method) {
 		switch (method) {
 			case McpSchema.METHOD_ROOTS_LIST:
-				return new MethodNotFoundError(method, "Roots not supported",
-						Map.of("reason", "Client does not have roots capability"));
+				Map<String, String> data = new HashMap<>();
+				data.put("reason", "Client does not have roots capability");
+				return new MethodNotFoundError(method, "Roots not supported", data);
 			default:
 				return new MethodNotFoundError(method, "Method not found: " + method, null);
 		}

@@ -4,6 +4,8 @@
 
 package io.modelcontextprotocol.server;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -268,7 +270,7 @@ public class McpAsyncServer {
 		// broadcasting loggingNotification.
 		private LoggingLevel minLoggingLevel = LoggingLevel.DEBUG;
 
-		private List<String> protocolVersions = List.of(McpSchema.LATEST_PROTOCOL_VERSION);
+		private List<String> protocolVersions = Arrays.asList(McpSchema.LATEST_PROTOCOL_VERSION);
 
 		AsyncServerImpl(McpServerTransportProvider mcpTransportProvider, ObjectMapper objectMapper,
 				McpServerFeatures.Async features) {
@@ -287,7 +289,10 @@ public class McpAsyncServer {
 			// Initialize request handlers for standard MCP methods
 
 			// Ping MUST respond with an empty data, but not NULL response.
-			requestHandlers.put(McpSchema.METHOD_PING, (exchange, params) -> Mono.just(Map.of()));
+			requestHandlers.put(McpSchema.METHOD_PING, (exchange, params) -> {
+				Map<String, Object> emptyMap = new HashMap<>();
+				return Mono.just(emptyMap);
+			});
 
 			// Add tools API handlers if the tool capability is enabled
 			if (this.serverCapabilities.tools() != null) {
@@ -321,7 +326,7 @@ public class McpAsyncServer {
 				.rootsChangeConsumers();
 
 			if (Utils.isEmpty(rootsChangeConsumers)) {
-				rootsChangeConsumers = List.of((exchange,
+				rootsChangeConsumers = Arrays.asList((exchange,
 						roots) -> Mono.fromRunnable(() -> logger.warn(
 								"Roots list changed notification, but no consumers provided. Roots list changed: {}",
 								roots)));
@@ -461,13 +466,16 @@ public class McpAsyncServer {
 			return this.mcpTransportProvider.notifyClients(McpSchema.METHOD_NOTIFICATION_TOOLS_LIST_CHANGED, null);
 		}
 
-		private McpServerSession.RequestHandler<McpSchema.ListToolsResult> toolsListRequestHandler() {
-			return (exchange, params) -> {
-				List<Tool> tools = this.tools.stream().map(McpServerFeatures.AsyncToolSpecification::tool).toList();
+	private McpServerSession.RequestHandler<McpSchema.ListToolsResult> toolsListRequestHandler() {
+		return (exchange, params) -> {
+			List<Tool> tools = new ArrayList<>();
+			for (McpServerFeatures.AsyncToolSpecification spec : this.tools) {
+				tools.add(spec.tool());
+			}
 
-				return Mono.just(new McpSchema.ListToolsResult(tools, null));
-			};
-		}
+			return Mono.just(new McpSchema.ListToolsResult(tools, null));
+		};
+	}
 
 		private McpServerSession.RequestHandler<CallToolResult> toolsCallRequestHandler() {
 			return (exchange, params) -> {
@@ -542,15 +550,15 @@ public class McpAsyncServer {
 			return this.mcpTransportProvider.notifyClients(McpSchema.METHOD_NOTIFICATION_RESOURCES_LIST_CHANGED, null);
 		}
 
-		private McpServerSession.RequestHandler<McpSchema.ListResourcesResult> resourcesListRequestHandler() {
-			return (exchange, params) -> {
-				var resourceList = this.resources.values()
-					.stream()
-					.map(McpServerFeatures.AsyncResourceSpecification::resource)
-					.toList();
-				return Mono.just(new McpSchema.ListResourcesResult(resourceList, null));
-			};
-		}
+	private McpServerSession.RequestHandler<McpSchema.ListResourcesResult> resourcesListRequestHandler() {
+		return (exchange, params) -> {
+			List<McpSchema.Resource> resourceList = new ArrayList<>();
+			for (McpServerFeatures.AsyncResourceSpecification spec : this.resources.values()) {
+				resourceList.add(spec.resource());
+			}
+			return Mono.just(new McpSchema.ListResourcesResult(resourceList, null));
+		};
+	}
 
 		private McpServerSession.RequestHandler<McpSchema.ListResourceTemplatesResult> resourceTemplateListRequestHandler() {
 			return (exchange, params) -> Mono
@@ -642,10 +650,10 @@ public class McpAsyncServer {
 				// new TypeReference<McpSchema.PaginatedRequest>() {
 				// });
 
-				var promptList = this.prompts.values()
-					.stream()
-					.map(McpServerFeatures.AsyncPromptSpecification::prompt)
-					.toList();
+				List<McpSchema.Prompt> promptList = new ArrayList<>();
+				for (McpServerFeatures.AsyncPromptSpecification spec : this.prompts.values()) {
+					promptList.add(spec.prompt());
+				}
 
 				return Mono.just(new McpSchema.ListPromptsResult(promptList, null));
 			};
@@ -700,7 +708,8 @@ public class McpAsyncServer {
 					// with the broadcasting loggingNotification.
 					this.minLoggingLevel = newMinLoggingLevel.level();
 
-					return Mono.just(Map.of());
+					Map<String, Object> emptyMap = new HashMap<>();
+					return Mono.just(emptyMap);
 				});
 			};
 		}
