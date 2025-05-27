@@ -5,9 +5,11 @@
 package io.modelcontextprotocol.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -181,10 +183,10 @@ class McpClientFeatures {
 							samplingHandler != null ? new McpSchema.ClientCapabilities.Sampling() : null);
 			this.roots = roots != null ? new ConcurrentHashMap<>(roots) : new ConcurrentHashMap<>();
 
-			this.toolsChangeConsumers = toolsChangeConsumers != null ? toolsChangeConsumers : List.of();
-			this.resourcesChangeConsumers = resourcesChangeConsumers != null ? resourcesChangeConsumers : List.of();
-			this.promptsChangeConsumers = promptsChangeConsumers != null ? promptsChangeConsumers : List.of();
-			this.loggingConsumers = loggingConsumers != null ? loggingConsumers : List.of();
+			this.toolsChangeConsumers = toolsChangeConsumers != null ? toolsChangeConsumers : Collections.emptyList();
+			this.resourcesChangeConsumers = resourcesChangeConsumers != null ? resourcesChangeConsumers : Collections.emptyList();
+			this.promptsChangeConsumers = promptsChangeConsumers != null ? promptsChangeConsumers : Collections.emptyList();
+			this.loggingConsumers = loggingConsumers != null ? loggingConsumers : Collections.emptyList();
 			this.samplingHandler = samplingHandler;
 		}
 
@@ -364,10 +366,10 @@ class McpClientFeatures {
 							samplingHandler != null ? new McpSchema.ClientCapabilities.Sampling() : null);
 			this.roots = roots != null ? new HashMap<>(roots) : new HashMap<>();
 
-			this.toolsChangeConsumers = toolsChangeConsumers != null ? toolsChangeConsumers : List.of();
-			this.resourcesChangeConsumers = resourcesChangeConsumers != null ? resourcesChangeConsumers : List.of();
-			this.promptsChangeConsumers = promptsChangeConsumers != null ? promptsChangeConsumers : List.of();
-			this.loggingConsumers = loggingConsumers != null ? loggingConsumers : List.of();
+			this.toolsChangeConsumers = toolsChangeConsumers != null ? toolsChangeConsumers : Collections.emptyList();
+			this.resourcesChangeConsumers = resourcesChangeConsumers != null ? resourcesChangeConsumers : Collections.emptyList();
+			this.promptsChangeConsumers = promptsChangeConsumers != null ? promptsChangeConsumers : Collections.emptyList();
+			this.loggingConsumers = loggingConsumers != null ? loggingConsumers : Collections.emptyList();
 			this.samplingHandler = samplingHandler;
 		}
 	}
