@@ -143,7 +143,8 @@ class WebMvcSseIntegrationTests {
 			assertThat(client.initialize()).isNotNull();
 
 			try {
-				client.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+				Map<String, Object> emptyParams = new HashMap<>();
+				client.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 			}
 			catch (McpError e) {
 				assertThat(e).isInstanceOf(McpError.class)
@@ -208,7 +209,8 @@ class WebMvcSseIntegrationTests {
 			InitializeResult initResult = mcpClient.initialize();
 			assertThat(initResult).isNotNull();
 
-			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+			Map<String, Object> emptyParams = new HashMap<>();
+			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 
 			assertThat(response).isNotNull().isEqualTo(callResponse);
 		}
