@@ -105,7 +105,7 @@ public class WebFluxSseIntegrationTests {
 	@ValueSource(strings = { "httpclient", "webflux" })
 	void testCreateMessageWithoutSamplingCapabilities(String clientType) {
 
-		var clientBuilder = clientBuilders.get(clientType);
+		McpClient.Builder clientBuilder = clientBuilders.get(clientType);
 
 		McpServerFeatures.AsyncToolSpecification tool = new McpServerFeatures.AsyncToolSpecification(
 				new McpSchema.Tool("tool1", "tool1 description", emptyJsonSchema), (exchange, request) -> {
@@ -115,15 +115,16 @@ public class WebFluxSseIntegrationTests {
 					return Mono.just(mock(CallToolResult.class));
 				});
 
-		var server = McpServer.async(mcpServerTransportProvider).serverInfo("test-server", "1.0.0").tools(tool).build();
+		McpServer server = McpServer.async(mcpServerTransportProvider).serverInfo("test-server", "1.0.0").tools(tool).build();
 
-		try (var client = clientBuilder.clientInfo(new McpSchema.Implementation("Sample " + "client", "0.0.0"))
+		try (McpClient client = clientBuilder.clientInfo(new McpSchema.Implementation("Sample " + "client", "0.0.0"))
 			.build();) {
 
 			assertThat(client.initialize()).isNotNull();
 
 			try {
-				client.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+				Map<String, Object> emptyParams = new HashMap<>();
+				client.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 			}
 			catch (McpError e) {
 				assertThat(e).isInstanceOf(McpError.class)
@@ -137,7 +138,7 @@ public class WebFluxSseIntegrationTests {
 	@ValueSource(strings = { "httpclient", "webflux" })
 	void testCreateMessageSuccess(String clientType) throws InterruptedException {
 
-		var clientBuilder = clientBuilders.get(clientType);
+		McpClient.Builder clientBuilder = clientBuilders.get(clientType);
 
 		Function<CreateMessageRequest, CreateMessageResult> samplingHandler = request -> {
 			assertThat(request.messages()).hasSize(1);
@@ -187,7 +188,7 @@ public class WebFluxSseIntegrationTests {
 			.tools(tool)
 			.build();
 
-		try (var mcpClient = clientBuilder.clientInfo(new McpSchema.Implementation("Sample client", "0.0.0"))
+		try (McpClient mcpClient = clientBuilder.clientInfo(new McpSchema.Implementation("Sample client", "0.0.0"))
 			.capabilities(ClientCapabilities.builder().sampling().build())
 			.sampling(samplingHandler)
 			.build()) {
@@ -195,7 +196,8 @@ public class WebFluxSseIntegrationTests {
 			InitializeResult initResult = mcpClient.initialize();
 			assertThat(initResult).isNotNull();
 
-			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", Map.of()));
+			Map<String, Object> emptyParams = new HashMap<>();
+			CallToolResult response = mcpClient.callTool(new McpSchema.CallToolRequest("tool1", emptyParams));
 
 			assertThat(response).isNotNull();
 			assertThat(response).isEqualTo(callResponse);
