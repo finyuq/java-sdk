@@ -6,6 +6,7 @@ package io.modelcontextprotocol.server;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,11 +172,11 @@ class WebMvcSseIntegrationTests {
 		McpServerFeatures.AsyncToolSpecification tool = new McpServerFeatures.AsyncToolSpecification(
 				new McpSchema.Tool("tool1", "tool1 description", emptyJsonSchema), (exchange, request) -> {
 
-					var craeteMessageRequest = McpSchema.CreateMessageRequest.builder()
-						.messages(List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER,
+					McpSchema.CreateMessageRequest.Builder craeteMessageRequest = McpSchema.CreateMessageRequest.builder()
+						.messages(Collections.singletonList(new McpSchema.SamplingMessage(McpSchema.Role.USER,
 								new McpSchema.TextContent("Test message"))))
 						.modelPreferences(ModelPreferences.builder()
-							.hints(List.of())
+							.hints(Collections.emptyList())
 							.costPriority(1.0)
 							.speedPriority(1.0)
 							.intelligencePriority(1.0)
@@ -195,13 +196,13 @@ class WebMvcSseIntegrationTests {
 				});
 
 		//@formatter:off		
-		var mcpServer = McpServer.async(mcpServerTransportProvider)
+		McpServer mcpServer = McpServer.async(mcpServerTransportProvider)
 				.serverInfo("test-server", "1.0.0")
 				.tools(tool)
 				.build();
 
 		try (
-			var mcpClient = clientBuilder.clientInfo(new McpSchema.Implementation("Sample client", "0.0.0"))
+			McpClient mcpClient = clientBuilder.clientInfo(new McpSchema.Implementation("Sample client", "0.0.0"))
 				.capabilities(ClientCapabilities.builder().sampling().build())
 				.sampling(samplingHandler)
 				.build()) {//@formatter:on
