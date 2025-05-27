@@ -6,9 +6,12 @@ package io.modelcontextprotocol.spec;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -179,35 +182,235 @@ public final class McpSchema {
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record JSONRPCRequest( // @formatter:off
-			@JsonProperty("jsonrpc") String jsonrpc,
-			@JsonProperty("method") String method,
-			@JsonProperty("id") Object id,
-			@JsonProperty("params") Object params) implements JSONRPCMessage {
+	public static class JSONRPCRequest implements JSONRPCMessage { // @formatter:off
+			private final String jsonrpc;
+			private final String method;
+			private final Object id;
+			private final Object params;
+			
+			@JsonCreator
+			public JSONRPCRequest(
+				@JsonProperty("jsonrpc") String jsonrpc,
+				@JsonProperty("method") String method,
+				@JsonProperty("id") Object id,
+				@JsonProperty("params") Object params) {
+				this.jsonrpc = jsonrpc;
+				this.method = method;
+				this.id = id;
+				this.params = params;
+			}
+			
+			public String jsonrpc() {
+				return jsonrpc;
+			}
+			
+			public String method() {
+				return method;
+			}
+			
+			public Object id() {
+				return id;
+			}
+			
+			public Object params() {
+				return params;
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				JSONRPCRequest that = (JSONRPCRequest) o;
+				return Objects.equals(jsonrpc, that.jsonrpc) &&
+					   Objects.equals(method, that.method) &&
+					   Objects.equals(id, that.id) &&
+					   Objects.equals(params, that.params);
+			}
+			
+			@Override
+			public int hashCode() {
+				return Objects.hash(jsonrpc, method, id, params);
+			}
+			
+			@Override
+			public String toString() {
+				return "JSONRPCRequest{" +
+					   "jsonrpc='" + jsonrpc + '\'' +
+					   ", method='" + method + '\'' +
+					   ", id=" + id +
+					   ", params=" + params +
+					   '}';
+			}
 	} // @formatter:on
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record JSONRPCNotification( // @formatter:off
-			@JsonProperty("jsonrpc") String jsonrpc,
-			@JsonProperty("method") String method,
-			@JsonProperty("params") Object params) implements JSONRPCMessage {
+	public static class JSONRPCNotification implements JSONRPCMessage { // @formatter:off
+			private final String jsonrpc;
+			private final String method;
+			private final Object params;
+			
+			@JsonCreator
+			public JSONRPCNotification(
+				@JsonProperty("jsonrpc") String jsonrpc,
+				@JsonProperty("method") String method,
+				@JsonProperty("params") Object params) {
+				this.jsonrpc = jsonrpc;
+				this.method = method;
+				this.params = params;
+			}
+			
+			public String jsonrpc() {
+				return jsonrpc;
+			}
+			
+			public String method() {
+				return method;
+			}
+			
+			public Object params() {
+				return params;
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				JSONRPCNotification that = (JSONRPCNotification) o;
+				return Objects.equals(jsonrpc, that.jsonrpc) &&
+					   Objects.equals(method, that.method) &&
+					   Objects.equals(params, that.params);
+			}
+			
+			@Override
+			public int hashCode() {
+				return Objects.hash(jsonrpc, method, params);
+			}
+			
+			@Override
+			public String toString() {
+				return "JSONRPCNotification{" +
+					   "jsonrpc='" + jsonrpc + '\'' +
+					   ", method='" + method + '\'' +
+					   ", params=" + params +
+					   '}';
+			}
 	} // @formatter:on
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record JSONRPCResponse( // @formatter:off
-			@JsonProperty("jsonrpc") String jsonrpc,
-			@JsonProperty("id") Object id,
-			@JsonProperty("result") Object result,
-			@JsonProperty("error") JSONRPCError error) implements JSONRPCMessage {
+	public static class JSONRPCResponse implements JSONRPCMessage { // @formatter:off
+			private final String jsonrpc;
+			private final Object id;
+			private final Object result;
+			private final JSONRPCError error;
+			
+			@JsonCreator
+			public JSONRPCResponse(
+				@JsonProperty("jsonrpc") String jsonrpc,
+				@JsonProperty("id") Object id,
+				@JsonProperty("result") Object result,
+				@JsonProperty("error") JSONRPCError error) {
+				this.jsonrpc = jsonrpc;
+				this.id = id;
+				this.result = result;
+				this.error = error;
+			}
+			
+			public String jsonrpc() {
+				return jsonrpc;
+			}
+			
+			public Object id() {
+				return id;
+			}
+			
+			public Object result() {
+				return result;
+			}
+			
+			public JSONRPCError error() {
+				return error;
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				JSONRPCResponse that = (JSONRPCResponse) o;
+				return Objects.equals(jsonrpc, that.jsonrpc) &&
+					   Objects.equals(id, that.id) &&
+					   Objects.equals(result, that.result) &&
+					   Objects.equals(error, that.error);
+			}
+			
+			@Override
+			public int hashCode() {
+				return Objects.hash(jsonrpc, id, result, error);
+			}
+			
+			@Override
+			public String toString() {
+				return "JSONRPCResponse{" +
+					   "jsonrpc='" + jsonrpc + '\'' +
+					   ", id=" + id +
+					   ", result=" + result +
+					   ", error=" + error +
+					   '}';
+			}
 
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)
 		@JsonIgnoreProperties(ignoreUnknown = true)
-		public record JSONRPCError(
-			@JsonProperty("code") int code,
-			@JsonProperty("message") String message,
-			@JsonProperty("data") Object data) {
+		public static class JSONRPCError {
+			private final int code;
+			private final String message;
+			private final Object data;
+			
+			@JsonCreator
+			public JSONRPCError(
+				@JsonProperty("code") int code,
+				@JsonProperty("message") String message,
+				@JsonProperty("data") Object data) {
+				this.code = code;
+				this.message = message;
+				this.data = data;
+			}
+			
+			public int code() {
+				return code;
+			}
+			
+			public String message() {
+				return message;
+			}
+			
+			public Object data() {
+				return data;
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				JSONRPCError that = (JSONRPCError) o;
+				return code == that.code &&
+					   Objects.equals(message, that.message) &&
+					   Objects.equals(data, that.data);
+			}
+			
+			@Override
+			public int hashCode() {
+				return Objects.hash(code, message, data);
+			}
+			
+			@Override
+			public String toString() {
+				return "JSONRPCError{" +
+					   "code=" + code +
+					   ", message='" + message + '\'' +
+					   ", data=" + data +
+					   '}';
+			}
 		}
 	}// @formatter:on
 
@@ -216,19 +419,119 @@ public final class McpSchema {
 	// ---------------------------
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record InitializeRequest( // @formatter:off
-		@JsonProperty("protocolVersion") String protocolVersion,
-		@JsonProperty("capabilities") ClientCapabilities capabilities,
-		@JsonProperty("clientInfo") Implementation clientInfo) implements Request {		
+	public static class InitializeRequest implements Request { // @formatter:off
+		private final String protocolVersion;
+		private final ClientCapabilities capabilities;
+		private final Implementation clientInfo;
+		
+		@JsonCreator
+		public InitializeRequest(
+			@JsonProperty("protocolVersion") String protocolVersion,
+			@JsonProperty("capabilities") ClientCapabilities capabilities,
+			@JsonProperty("clientInfo") Implementation clientInfo) {
+			this.protocolVersion = protocolVersion;
+			this.capabilities = capabilities;
+			this.clientInfo = clientInfo;
+		}
+		
+		public String protocolVersion() {
+			return protocolVersion;
+		}
+		
+		public ClientCapabilities capabilities() {
+			return capabilities;
+		}
+		
+		public Implementation clientInfo() {
+			return clientInfo;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			InitializeRequest that = (InitializeRequest) o;
+			return Objects.equals(protocolVersion, that.protocolVersion) &&
+				   Objects.equals(capabilities, that.capabilities) &&
+				   Objects.equals(clientInfo, that.clientInfo);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(protocolVersion, capabilities, clientInfo);
+		}
+		
+		@Override
+		public String toString() {
+			return "InitializeRequest{" +
+				   "protocolVersion='" + protocolVersion + '\'' +
+				   ", capabilities=" + capabilities +
+				   ", clientInfo=" + clientInfo +
+				   '}';
+		}
 	} // @formatter:on
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record InitializeResult( // @formatter:off
-		@JsonProperty("protocolVersion") String protocolVersion,
-		@JsonProperty("capabilities") ServerCapabilities capabilities,
-		@JsonProperty("serverInfo") Implementation serverInfo,
-		@JsonProperty("instructions") String instructions) {
+	public static class InitializeResult { // @formatter:off
+		private final String protocolVersion;
+		private final ServerCapabilities capabilities;
+		private final Implementation serverInfo;
+		private final String instructions;
+		
+		@JsonCreator
+		public InitializeResult(
+			@JsonProperty("protocolVersion") String protocolVersion,
+			@JsonProperty("capabilities") ServerCapabilities capabilities,
+			@JsonProperty("serverInfo") Implementation serverInfo,
+			@JsonProperty("instructions") String instructions) {
+			this.protocolVersion = protocolVersion;
+			this.capabilities = capabilities;
+			this.serverInfo = serverInfo;
+			this.instructions = instructions;
+		}
+		
+		public String protocolVersion() {
+			return protocolVersion;
+		}
+		
+		public ServerCapabilities capabilities() {
+			return capabilities;
+		}
+		
+		public Implementation serverInfo() {
+			return serverInfo;
+		}
+		
+		public String instructions() {
+			return instructions;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			InitializeResult that = (InitializeResult) o;
+			return Objects.equals(protocolVersion, that.protocolVersion) &&
+				   Objects.equals(capabilities, that.capabilities) &&
+				   Objects.equals(serverInfo, that.serverInfo) &&
+				   Objects.equals(instructions, that.instructions);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(protocolVersion, capabilities, serverInfo, instructions);
+		}
+		
+		@Override
+		public String toString() {
+			return "InitializeResult{" +
+				   "protocolVersion='" + protocolVersion + '\'' +
+				   ", capabilities=" + capabilities +
+				   ", serverInfo=" + serverInfo +
+				   ", instructions='" + instructions + '\'' +
+				   '}';
+		}
 	} // @formatter:on
 
 	/**
@@ -247,10 +550,56 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record ClientCapabilities( // @formatter:off
-		@JsonProperty("experimental") Map<String, Object> experimental,
-		@JsonProperty("roots") RootCapabilities roots,
-		@JsonProperty("sampling") Sampling sampling) {
+	public static class ClientCapabilities { // @formatter:off
+		private final Map<String, Object> experimental;
+		private final RootCapabilities roots;
+		private final Sampling sampling;
+		
+		@JsonCreator
+		public ClientCapabilities(
+			@JsonProperty("experimental") Map<String, Object> experimental,
+			@JsonProperty("roots") RootCapabilities roots,
+			@JsonProperty("sampling") Sampling sampling) {
+			this.experimental = experimental;
+			this.roots = roots;
+			this.sampling = sampling;
+		}
+		
+		public Map<String, Object> experimental() {
+			return experimental;
+		}
+		
+		public RootCapabilities roots() {
+			return roots;
+		}
+		
+		public Sampling sampling() {
+			return sampling;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			ClientCapabilities that = (ClientCapabilities) o;
+			return Objects.equals(experimental, that.experimental) &&
+				   Objects.equals(roots, that.roots) &&
+				   Objects.equals(sampling, that.sampling);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(experimental, roots, sampling);
+		}
+		
+		@Override
+		public String toString() {
+			return "ClientCapabilities{" +
+				   "experimental=" + experimental +
+				   ", roots=" + roots +
+				   ", sampling=" + sampling +
+				   '}';
+		}
 
 		/**
 		 * Roots define the boundaries of where servers can operate within the filesystem,
@@ -263,8 +612,38 @@ public final class McpSchema {
 		 */
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)
 		@JsonIgnoreProperties(ignoreUnknown = true)	
-		public record RootCapabilities(
-			@JsonProperty("listChanged") Boolean listChanged) {
+		public static class RootCapabilities {
+			private final Boolean listChanged;
+			
+			@JsonCreator
+			public RootCapabilities(
+				@JsonProperty("listChanged") Boolean listChanged) {
+				this.listChanged = listChanged;
+			}
+			
+			public Boolean listChanged() {
+				return listChanged;
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				RootCapabilities that = (RootCapabilities) o;
+				return Objects.equals(listChanged, that.listChanged);
+			}
+			
+			@Override
+			public int hashCode() {
+				return Objects.hash(listChanged);
+			}
+			
+			@Override
+			public String toString() {
+				return "RootCapabilities{" +
+					   "listChanged=" + listChanged +
+					   '}';
+			}
 		}
 
 		/**
@@ -278,7 +657,28 @@ public final class McpSchema {
 		 * from MCP servers in their prompts.
 		 */
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)			
-		public record Sampling() {
+		public static class Sampling {
+			
+			@JsonCreator
+			public Sampling() {
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				return true;
+			}
+			
+			@Override
+			public int hashCode() {
+				return 0;
+			}
+			
+			@Override
+			public String toString() {
+				return "Sampling{}";
+			}
 		}
 
 		public static Builder builder() {
@@ -313,32 +713,212 @@ public final class McpSchema {
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record ServerCapabilities( // @formatter:off
-		@JsonProperty("experimental") Map<String, Object> experimental,
-		@JsonProperty("logging") LoggingCapabilities logging,
-		@JsonProperty("prompts") PromptCapabilities prompts,
-		@JsonProperty("resources") ResourceCapabilities resources,
-		@JsonProperty("tools") ToolCapabilities tools) {
-
+	public static class ServerCapabilities { // @formatter:off
+		private final Map<String, Object> experimental;
+		private final LoggingCapabilities logging;
+		private final PromptCapabilities prompts;
+		private final ResourceCapabilities resources;
+		private final ToolCapabilities tools;
+		
+		@JsonCreator
+		public ServerCapabilities(
+			@JsonProperty("experimental") Map<String, Object> experimental,
+			@JsonProperty("logging") LoggingCapabilities logging,
+			@JsonProperty("prompts") PromptCapabilities prompts,
+			@JsonProperty("resources") ResourceCapabilities resources,
+			@JsonProperty("tools") ToolCapabilities tools) {
+			this.experimental = experimental;
+			this.logging = logging;
+			this.prompts = prompts;
+			this.resources = resources;
+			this.tools = tools;
+		}
+		
+		public Map<String, Object> experimental() {
+			return experimental;
+		}
+		
+		public LoggingCapabilities logging() {
+			return logging;
+		}
+		
+		public PromptCapabilities prompts() {
+			return prompts;
+		}
+		
+		public ResourceCapabilities resources() {
+			return resources;
+		}
+		
+		public ToolCapabilities tools() {
+			return tools;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			ServerCapabilities that = (ServerCapabilities) o;
+			return Objects.equals(experimental, that.experimental) &&
+				   Objects.equals(logging, that.logging) &&
+				   Objects.equals(prompts, that.prompts) &&
+				   Objects.equals(resources, that.resources) &&
+				   Objects.equals(tools, that.tools);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(experimental, logging, prompts, resources, tools);
+		}
+		
+		@Override
+		public String toString() {
+			return "ServerCapabilities{" +
+				   "experimental=" + experimental +
+				   ", logging=" + logging +
+				   ", prompts=" + prompts +
+				   ", resources=" + resources +
+				   ", tools=" + tools +
+				   '}';
+		}
 			
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)
-		public record LoggingCapabilities() {
+		public static class LoggingCapabilities {
+			
+			@JsonCreator
+			public LoggingCapabilities() {
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				return true;
+			}
+			
+			@Override
+			public int hashCode() {
+				return 0;
+			}
+			
+			@Override
+			public String toString() {
+				return "LoggingCapabilities{}";
+			}
 		}
 	
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)
-		public record PromptCapabilities(
-			@JsonProperty("listChanged") Boolean listChanged) {
+		public static class PromptCapabilities {
+			private final Boolean listChanged;
+			
+			@JsonCreator
+			public PromptCapabilities(
+				@JsonProperty("listChanged") Boolean listChanged) {
+				this.listChanged = listChanged;
+			}
+			
+			public Boolean listChanged() {
+				return listChanged;
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				PromptCapabilities that = (PromptCapabilities) o;
+				return Objects.equals(listChanged, that.listChanged);
+			}
+			
+			@Override
+			public int hashCode() {
+				return Objects.hash(listChanged);
+			}
+			
+			@Override
+			public String toString() {
+				return "PromptCapabilities{" +
+					   "listChanged=" + listChanged +
+					   '}';
+			}
 		}
 
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)
-		public record ResourceCapabilities(
-			@JsonProperty("subscribe") Boolean subscribe,
-			@JsonProperty("listChanged") Boolean listChanged) {
+		public static class ResourceCapabilities {
+			private final Boolean subscribe;
+			private final Boolean listChanged;
+			
+			@JsonCreator
+			public ResourceCapabilities(
+				@JsonProperty("subscribe") Boolean subscribe,
+				@JsonProperty("listChanged") Boolean listChanged) {
+				this.subscribe = subscribe;
+				this.listChanged = listChanged;
+			}
+			
+			public Boolean subscribe() {
+				return subscribe;
+			}
+			
+			public Boolean listChanged() {
+				return listChanged;
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				ResourceCapabilities that = (ResourceCapabilities) o;
+				return Objects.equals(subscribe, that.subscribe) &&
+					   Objects.equals(listChanged, that.listChanged);
+			}
+			
+			@Override
+			public int hashCode() {
+				return Objects.hash(subscribe, listChanged);
+			}
+			
+			@Override
+			public String toString() {
+				return "ResourceCapabilities{" +
+					   "subscribe=" + subscribe +
+					   ", listChanged=" + listChanged +
+					   '}';
+			}
 		}
 
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)
-		public record ToolCapabilities(
-			@JsonProperty("listChanged") Boolean listChanged) {
+		public static class ToolCapabilities {
+			private final Boolean listChanged;
+			
+			@JsonCreator
+			public ToolCapabilities(
+				@JsonProperty("listChanged") Boolean listChanged) {
+				this.listChanged = listChanged;
+			}
+			
+			public Boolean listChanged() {
+				return listChanged;
+			}
+			
+			@Override
+			public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				ToolCapabilities that = (ToolCapabilities) o;
+				return Objects.equals(listChanged, that.listChanged);
+			}
+			
+			@Override
+			public int hashCode() {
+				return Objects.hash(listChanged);
+			}
+			
+			@Override
+			public String toString() {
+				return "ToolCapabilities{" +
+					   "listChanged=" + listChanged +
+					   '}';
+			}
 		}
 
 		public static Builder builder() {
@@ -530,7 +1110,7 @@ public final class McpSchema {
 	@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, include = As.PROPERTY)
 	@JsonSubTypes({ @JsonSubTypes.Type(value = TextResourceContents.class, name = "text"),
 			@JsonSubTypes.Type(value = BlobResourceContents.class, name = "blob") })
-	public sealed interface ResourceContents permits TextResourceContents, BlobResourceContents {
+	public interface ResourceContents {
 
 		/**
 		 * The URI of this resource.
@@ -556,10 +1136,58 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record TextResourceContents( // @formatter:off
-		@JsonProperty("uri") String uri,
-		@JsonProperty("mimeType") String mimeType,
-		@JsonProperty("text") String text) implements ResourceContents {
+	public static class TextResourceContents implements ResourceContents { // @formatter:off
+		private final String uri;
+		private final String mimeType;
+		private final String text;
+		
+		@JsonCreator
+		public TextResourceContents(
+			@JsonProperty("uri") String uri,
+			@JsonProperty("mimeType") String mimeType,
+			@JsonProperty("text") String text) {
+			this.uri = uri;
+			this.mimeType = mimeType;
+			this.text = text;
+		}
+		
+		@Override
+		public String uri() {
+			return uri;
+		}
+		
+		@Override
+		public String mimeType() {
+			return mimeType;
+		}
+		
+		public String text() {
+			return text;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			TextResourceContents that = (TextResourceContents) o;
+			return Objects.equals(uri, that.uri) &&
+				   Objects.equals(mimeType, that.mimeType) &&
+				   Objects.equals(text, that.text);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(uri, mimeType, text);
+		}
+		
+		@Override
+		public String toString() {
+			return "TextResourceContents{" +
+				   "uri='" + uri + '\'' +
+				   ", mimeType='" + mimeType + '\'' +
+				   ", text='" + text + '\'' +
+				   '}';
+		}
 	} // @formatter:on
 
 	/**
@@ -573,10 +1201,58 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record BlobResourceContents( // @formatter:off
-		@JsonProperty("uri") String uri,
-		@JsonProperty("mimeType") String mimeType,
-		@JsonProperty("blob") String blob) implements ResourceContents {
+	public static class BlobResourceContents implements ResourceContents { // @formatter:off
+		private final String uri;
+		private final String mimeType;
+		private final String blob;
+		
+		@JsonCreator
+		public BlobResourceContents(
+			@JsonProperty("uri") String uri,
+			@JsonProperty("mimeType") String mimeType,
+			@JsonProperty("blob") String blob) {
+			this.uri = uri;
+			this.mimeType = mimeType;
+			this.blob = blob;
+		}
+		
+		@Override
+		public String uri() {
+			return uri;
+		}
+		
+		@Override
+		public String mimeType() {
+			return mimeType;
+		}
+		
+		public String blob() {
+			return blob;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			BlobResourceContents that = (BlobResourceContents) o;
+			return Objects.equals(uri, that.uri) &&
+				   Objects.equals(mimeType, that.mimeType) &&
+				   Objects.equals(blob, that.blob);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(uri, mimeType, blob);
+		}
+		
+		@Override
+		public String toString() {
+			return "BlobResourceContents{" +
+				   "uri='" + uri + '\'' +
+				   ", mimeType='" + mimeType + '\'' +
+				   ", blob='" + blob + '\'' +
+				   '}';
+		}
 	} // @formatter:on
 
 	// ---------------------------
@@ -591,10 +1267,56 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record Prompt( // @formatter:off
-		@JsonProperty("name") String name,
-		@JsonProperty("description") String description,
-		@JsonProperty("arguments") List<PromptArgument> arguments) {
+	public static class Prompt { // @formatter:off
+		private final String name;
+		private final String description;
+		private final List<PromptArgument> arguments;
+		
+		@JsonCreator
+		public Prompt(
+			@JsonProperty("name") String name,
+			@JsonProperty("description") String description,
+			@JsonProperty("arguments") List<PromptArgument> arguments) {
+			this.name = name;
+			this.description = description;
+			this.arguments = arguments;
+		}
+		
+		public String name() {
+			return name;
+		}
+		
+		public String description() {
+			return description;
+		}
+		
+		public List<PromptArgument> arguments() {
+			return arguments;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			Prompt prompt = (Prompt) o;
+			return Objects.equals(name, prompt.name) &&
+				   Objects.equals(description, prompt.description) &&
+				   Objects.equals(arguments, prompt.arguments);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, description, arguments);
+		}
+		
+		@Override
+		public String toString() {
+			return "Prompt{" +
+				   "name='" + name + '\'' +
+				   ", description='" + description + '\'' +
+				   ", arguments=" + arguments +
+				   '}';
+		}
 	} // @formatter:on
 
 	/**
@@ -606,10 +1328,56 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record PromptArgument( // @formatter:off
-		@JsonProperty("name") String name,
-		@JsonProperty("description") String description,
-		@JsonProperty("required") Boolean required) {
+	public static class PromptArgument { // @formatter:off
+		private final String name;
+		private final String description;
+		private final Boolean required;
+		
+		@JsonCreator
+		public PromptArgument(
+			@JsonProperty("name") String name,
+			@JsonProperty("description") String description,
+			@JsonProperty("required") Boolean required) {
+			this.name = name;
+			this.description = description;
+			this.required = required;
+		}
+		
+		public String name() {
+			return name;
+		}
+		
+		public String description() {
+			return description;
+		}
+		
+		public Boolean required() {
+			return required;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			PromptArgument that = (PromptArgument) o;
+			return Objects.equals(name, that.name) &&
+				   Objects.equals(description, that.description) &&
+				   Objects.equals(required, that.required);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, description, required);
+		}
+		
+		@Override
+		public String toString() {
+			return "PromptArgument{" +
+				   "name='" + name + '\'' +
+				   ", description='" + description + '\'' +
+				   ", required=" + required +
+				   '}';
+		}
 	}// @formatter:on
 
 	/**
@@ -623,9 +1391,47 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record PromptMessage( // @formatter:off
-		@JsonProperty("role") Role role,
-		@JsonProperty("content") Content content) {
+	public static class PromptMessage { // @formatter:off
+		private final Role role;
+		private final Content content;
+		
+		@JsonCreator
+		public PromptMessage(
+			@JsonProperty("role") Role role,
+			@JsonProperty("content") Content content) {
+			this.role = role;
+			this.content = content;
+		}
+		
+		public Role role() {
+			return role;
+		}
+		
+		public Content content() {
+			return content;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			PromptMessage that = (PromptMessage) o;
+			return Objects.equals(role, that.role) &&
+				   Objects.equals(content, that.content);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(role, content);
+		}
+		
+		@Override
+		public String toString() {
+			return "PromptMessage{" +
+				   "role=" + role +
+				   ", content=" + content +
+				   '}';
+		}
 	} // @formatter:on
 
 	/**
@@ -680,18 +1486,110 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record ListToolsResult( // @formatter:off
-		@JsonProperty("tools") List<Tool> tools,
-		@JsonProperty("nextCursor") String nextCursor) {
+	public static class ListToolsResult { // @formatter:off
+		private final List<Tool> tools;
+		private final String nextCursor;
+		
+		@JsonCreator
+		public ListToolsResult(
+			@JsonProperty("tools") List<Tool> tools,
+			@JsonProperty("nextCursor") String nextCursor) {
+			this.tools = tools;
+			this.nextCursor = nextCursor;
+		}
+		
+		public List<Tool> tools() {
+			return tools;
+		}
+		
+		public String nextCursor() {
+			return nextCursor;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			ListToolsResult that = (ListToolsResult) o;
+			return Objects.equals(tools, that.tools) &&
+				   Objects.equals(nextCursor, that.nextCursor);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(tools, nextCursor);
+		}
+		
+		@Override
+		public String toString() {
+			return "ListToolsResult{" +
+				   "tools=" + tools +
+				   ", nextCursor='" + nextCursor + '\'' +
+				   '}';
+		}
 	}// @formatter:on
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record JsonSchema( // @formatter:off
-		@JsonProperty("type") String type,
-		@JsonProperty("properties") Map<String, Object> properties,
-		@JsonProperty("required") List<String> required,
-		@JsonProperty("additionalProperties") Boolean additionalProperties) {
+	public static class JsonSchema { // @formatter:off
+		private final String type;
+		private final Map<String, Object> properties;
+		private final List<String> required;
+		private final Boolean additionalProperties;
+		
+		@JsonCreator
+		public JsonSchema(
+			@JsonProperty("type") String type,
+			@JsonProperty("properties") Map<String, Object> properties,
+			@JsonProperty("required") List<String> required,
+			@JsonProperty("additionalProperties") Boolean additionalProperties) {
+			this.type = type;
+			this.properties = properties;
+			this.required = required;
+			this.additionalProperties = additionalProperties;
+		}
+		
+		public String type() {
+			return type;
+		}
+		
+		public Map<String, Object> properties() {
+			return properties;
+		}
+		
+		public List<String> required() {
+			return required;
+		}
+		
+		public Boolean additionalProperties() {
+			return additionalProperties;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			JsonSchema that = (JsonSchema) o;
+			return Objects.equals(type, that.type) &&
+				   Objects.equals(properties, that.properties) &&
+				   Objects.equals(required, that.required) &&
+				   Objects.equals(additionalProperties, that.additionalProperties);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(type, properties, required, additionalProperties);
+		}
+		
+		@Override
+		public String toString() {
+			return "JsonSchema{" +
+				   "type='" + type + '\'' +
+				   ", properties=" + properties +
+				   ", required=" + required +
+				   ", additionalProperties=" + additionalProperties +
+				   '}';
+		}
 	} // @formatter:on
 
 	/**
@@ -709,15 +1607,60 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record Tool( // @formatter:off
-		@JsonProperty("name") String name,
-		@JsonProperty("description") String description,
-		@JsonProperty("inputSchema") JsonSchema inputSchema) {
-	
+	public static class Tool { // @formatter:off
+		private final String name;
+		private final String description;
+		private final JsonSchema inputSchema;
+		
+		@JsonCreator
+		public Tool(
+			@JsonProperty("name") String name,
+			@JsonProperty("description") String description,
+			@JsonProperty("inputSchema") JsonSchema inputSchema) {
+			this.name = name;
+			this.description = description;
+			this.inputSchema = inputSchema;
+		}
+		
 		public Tool(String name, String description, String schema) {
 			this(name, description, parseSchema(schema));
 		}
-			
+		
+		public String name() {
+			return name;
+		}
+		
+		public String description() {
+			return description;
+		}
+		
+		public JsonSchema inputSchema() {
+			return inputSchema;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			Tool tool = (Tool) o;
+			return Objects.equals(name, tool.name) &&
+				   Objects.equals(description, tool.description) &&
+				   Objects.equals(inputSchema, tool.inputSchema);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, description, inputSchema);
+		}
+		
+		@Override
+		public String toString() {
+			return "Tool{" +
+				   "name='" + name + '\'' +
+				   ", description='" + description + '\'' +
+				   ", inputSchema=" + inputSchema +
+				   '}';
+		}
 	} // @formatter:on
 
 	private static JsonSchema parseSchema(String schema) {
@@ -739,14 +1682,30 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record CallToolRequest(// @formatter:off
-		@JsonProperty("name") String name,
-		@JsonProperty("arguments") Map<String, Object> arguments) implements Request {
-
+	public static class CallToolRequest implements Request {// @formatter:off
+		private final String name;
+		private final Map<String, Object> arguments;
+		
+		@JsonCreator
+		public CallToolRequest(
+			@JsonProperty("name") String name,
+			@JsonProperty("arguments") Map<String, Object> arguments) {
+			this.name = name;
+			this.arguments = arguments;
+		}
+		
 		public CallToolRequest(String name, String jsonArguments) {
 			this(name, parseJsonArguments(jsonArguments));			
 		}
-
+		
+		public String name() {
+			return name;
+		}
+		
+		public Map<String, Object> arguments() {
+			return arguments;
+		}
+		
 		private static Map<String, Object> parseJsonArguments(String jsonArguments) {
 			try {
 				return OBJECT_MAPPER.readValue(jsonArguments, MAP_TYPE_REF);
@@ -754,6 +1713,28 @@ public final class McpSchema {
 			catch (IOException e) {
 				throw new IllegalArgumentException("Invalid arguments: " + jsonArguments, e);
 			}
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			CallToolRequest that = (CallToolRequest) o;
+			return Objects.equals(name, that.name) &&
+				   Objects.equals(arguments, that.arguments);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, arguments);
+		}
+		
+		@Override
+		public String toString() {
+			return "CallToolRequest{" +
+				   "name='" + name + '\'' +
+				   ", arguments=" + arguments +
+				   '}';
 		}
 	}// @formatter:off
 
@@ -767,9 +1748,17 @@ public final class McpSchema {
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record CallToolResult( // @formatter:off
-		@JsonProperty("content") List<Content> content,
-		@JsonProperty("isError") Boolean isError) {
+	public static class CallToolResult { // @formatter:off
+		private final List<Content> content;
+		private final Boolean isError;
+		
+		@JsonCreator
+		public CallToolResult(
+			@JsonProperty("content") List<Content> content,
+			@JsonProperty("isError") Boolean isError) {
+			this.content = content;
+			this.isError = isError;
+		}
 
 		/**
 		 * Creates a new instance of {@link CallToolResult} with a string containing the
@@ -781,7 +1770,37 @@ public final class McpSchema {
 		 *                If false or absent, indicates successful execution.
 		 */
 		public CallToolResult(String content, Boolean isError) {
-			this(List.of(new TextContent(content)), isError);
+			this(Collections.singletonList(new TextContent(content)), isError);
+		}
+		
+		public List<Content> content() {
+			return content;
+		}
+		
+		public Boolean isError() {
+			return isError;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			CallToolResult that = (CallToolResult) o;
+			return Objects.equals(content, that.content) &&
+				   Objects.equals(isError, that.isError);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(content, isError);
+		}
+		
+		@Override
+		public String toString() {
+			return "CallToolResult{" +
+				   "content=" + content +
+				   ", isError=" + isError +
+				   '}';
 		}
 
 		/**

@@ -3,6 +3,8 @@
 */
 package io.modelcontextprotocol.server;
 
+import java.util.Objects;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 
@@ -14,13 +16,50 @@ import org.springframework.web.servlet.DispatcherServlet;
  */
 public class TomcatTestUtil {
 
-	public record TomcatServer(Tomcat tomcat, AnnotationConfigWebApplicationContext appContext) {
+	public static class TomcatServer {
+		private final Tomcat tomcat;
+		private final AnnotationConfigWebApplicationContext appContext;
+		
+		public TomcatServer(Tomcat tomcat, AnnotationConfigWebApplicationContext appContext) {
+			this.tomcat = tomcat;
+			this.appContext = appContext;
+		}
+		
+		public Tomcat tomcat() {
+			return tomcat;
+		}
+		
+		public AnnotationConfigWebApplicationContext appContext() {
+			return appContext;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			TomcatServer that = (TomcatServer) o;
+			return Objects.equals(tomcat, that.tomcat) && 
+				   Objects.equals(appContext, that.appContext);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(tomcat, appContext);
+		}
+		
+		@Override
+		public String toString() {
+			return "TomcatServer{" +
+				   "tomcat=" + tomcat +
+				   ", appContext=" + appContext +
+				   '}';
+		}
 	}
 
 	public TomcatServer createTomcatServer(String contextPath, int port, Class<?> componentClass) {
 
 		// Set up Tomcat first
-		var tomcat = new Tomcat();
+		Tomcat tomcat = new Tomcat();
 		tomcat.setPort(port);
 
 		// Set Tomcat base directory to java.io.tmpdir to avoid permission issues
@@ -31,7 +70,7 @@ public class TomcatTestUtil {
 		Context context = tomcat.addContext(contextPath, baseDir);
 
 		// Create and configure Spring WebMvc context
-		var appContext = new AnnotationConfigWebApplicationContext();
+		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
 		appContext.register(componentClass);
 		appContext.setServletContext(context.getServletContext());
 		appContext.refresh();
@@ -40,14 +79,14 @@ public class TomcatTestUtil {
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(appContext);
 
 		// Add servlet to Tomcat and get the wrapper
-		var wrapper = Tomcat.addServlet(context, "dispatcherServlet", dispatcherServlet);
+		org.apache.catalina.Wrapper wrapper = Tomcat.addServlet(context, "dispatcherServlet", dispatcherServlet);
 		wrapper.setLoadOnStartup(1);
 		wrapper.setAsyncSupported(true);
 		context.addServletMappingDecoded("/*", "dispatcherServlet");
 
 		try {
 			// Configure and start the connector with async support
-			var connector = tomcat.getConnector();
+			org.apache.catalina.connector.Connector connector = tomcat.getConnector();
 			connector.setAsyncTimeout(3000); // 3 seconds timeout for async requests
 		}
 		catch (Exception e) {
