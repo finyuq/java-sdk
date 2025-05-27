@@ -6,7 +6,10 @@ package io.modelcontextprotocol.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,15 +29,18 @@ class UtilsTests {
 	@Test
 	void testCollectionIsEmpty() {
 		assertTrue(Utils.isEmpty((Collection<?>) null));
-		assertTrue(Utils.isEmpty(List.of()));
-		assertFalse(Utils.isEmpty(List.of("test")));
+		assertTrue(Utils.isEmpty(Collections.emptyList()));
+		assertFalse(Utils.isEmpty(Collections.singletonList("test")));
 	}
 
 	@Test
 	void testMapIsEmpty() {
 		assertTrue(Utils.isEmpty((Map<?, ?>) null));
-		assertTrue(Utils.isEmpty(Map.of()));
-		assertFalse(Utils.isEmpty(Map.of("key", "value")));
+		assertTrue(Utils.isEmpty(Collections.emptyMap()));
+		
+		Map<String, String> singleEntryMap = new HashMap<>();
+		singleEntryMap.put("key", "value");
+		assertFalse(Utils.isEmpty(singleEntryMap));
 	}
 
 }
