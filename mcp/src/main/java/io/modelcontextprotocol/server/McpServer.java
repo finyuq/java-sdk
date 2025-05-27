@@ -440,11 +440,13 @@ public interface McpServer {
 		 *
 		 * <p>
 		 * Example usage: <pre>{@code
-		 * .prompts(Map.of("analysis", new McpServerFeatures.AsyncPromptSpecification(
+		 * Map<String, McpServerFeatures.AsyncPromptSpecification> promptsMap = new HashMap<>();
+		 * promptsMap.put("analysis", new McpServerFeatures.AsyncPromptSpecification(
 		 *     new Prompt("analysis", "Code analysis template"),
 		 *     request -> Mono.fromSupplier(() -> generateAnalysisPrompt(request))
 		 *         .map(GetPromptResult::new)
-		 * )));
+		 * ));
+		 * .prompts(promptsMap);
 		 * }</pre>
 		 * @param prompts Map of prompt name to specification. Must not be null.
 		 * @return This builder instance for method chaining
