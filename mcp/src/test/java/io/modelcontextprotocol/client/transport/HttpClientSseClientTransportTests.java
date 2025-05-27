@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -107,18 +108,18 @@ class HttpClientSseClientTransportTests {
 	@Test
 	void testMessageProcessing() {
 		// Create a test message
+		Map<String, Object> params = new HashMap<>();
+		params.put("key", "value");
 		JSONRPCRequest testMessage = new JSONRPCRequest(McpSchema.JSONRPC_VERSION, "test-method", "test-id",
-				Map.of("key", "value"));
+				params);
 
 		// Simulate receiving the message
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "method": "test-method",
-				    "id": "test-id",
-				    "params": {"key": "value"}
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"method\": \"test-method\",\n" +
+				"    \"id\": \"test-id\",\n" +
+				"    \"params\": {\"key\": \"value\"}\n" +
+				"}");
 
 		// Subscribe to messages and verify
 		StepVerifier.create(transport.sendMessage(testMessage)).verifyComplete();
@@ -129,17 +130,17 @@ class HttpClientSseClientTransportTests {
 	@Test
 	void testResponseMessageProcessing() {
 		// Simulate receiving a response message
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "id": "test-id",
-				    "result": {"status": "success"}
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"id\": \"test-id\",\n" +
+				"    \"result\": {\"status\": \"success\"}\n" +
+				"}");
 
 		// Create and send a request message
+		Map<String, Object> params = new HashMap<>();
+		params.put("key", "value");
 		JSONRPCRequest testMessage = new JSONRPCRequest(McpSchema.JSONRPC_VERSION, "test-method", "test-id",
-				Map.of("key", "value"));
+				params);
 
 		// Verify message handling
 		StepVerifier.create(transport.sendMessage(testMessage)).verifyComplete();
@@ -150,20 +151,20 @@ class HttpClientSseClientTransportTests {
 	@Test
 	void testErrorMessageProcessing() {
 		// Simulate receiving an error message
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "id": "test-id",
-				    "error": {
-				        "code": -32600,
-				        "message": "Invalid Request"
-				    }
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"id\": \"test-id\",\n" +
+				"    \"error\": {\n" +
+				"        \"code\": -32600,\n" +
+				"        \"message\": \"Invalid Request\"\n" +
+				"    }\n" +
+				"}");
 
 		// Create and send a request message
+		Map<String, Object> params = new HashMap<>();
+		params.put("key", "value");
 		JSONRPCRequest testMessage = new JSONRPCRequest(McpSchema.JSONRPC_VERSION, "test-method", "test-id",
-				Map.of("key", "value"));
+				params);
 
 		// Verify message handling
 		StepVerifier.create(transport.sendMessage(testMessage)).verifyComplete();
@@ -174,13 +175,11 @@ class HttpClientSseClientTransportTests {
 	@Test
 	void testNotificationMessageProcessing() {
 		// Simulate receiving a notification message (no id)
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "method": "update",
-				    "params": {"status": "processing"}
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"method\": \"update\",\n" +
+				"    \"params\": {\"status\": \"processing\"}\n" +
+				"}");
 
 		// Verify the notification was processed
 		assertThat(transport.getInboundMessageCount()).isEqualTo(1);
@@ -192,8 +191,10 @@ class HttpClientSseClientTransportTests {
 		StepVerifier.create(transport.closeGracefully()).verifyComplete();
 
 		// Create a test message
+		Map<String, Object> params = new HashMap<>();
+		params.put("key", "value");
 		JSONRPCRequest testMessage = new JSONRPCRequest(McpSchema.JSONRPC_VERSION, "test-method", "test-id",
-				Map.of("key", "value"));
+				params);
 
 		// Verify message is not processed after shutdown
 		StepVerifier.create(transport.sendMessage(testMessage)).verifyComplete();
@@ -218,30 +219,30 @@ class HttpClientSseClientTransportTests {
 	@Test
 	void testMultipleMessageProcessing() {
 		// Simulate receiving multiple messages in sequence
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "method": "method1",
-				    "id": "id1",
-				    "params": {"key": "value1"}
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"method\": \"method1\",\n" +
+				"    \"id\": \"id1\",\n" +
+				"    \"params\": {\"key\": \"value1\"}\n" +
+				"}");
 
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "method": "method2",
-				    "id": "id2",
-				    "params": {"key": "value2"}
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"method\": \"method2\",\n" +
+				"    \"id\": \"id2\",\n" +
+				"    \"params\": {\"key\": \"value2\"}\n" +
+				"}");
 
 		// Create and send corresponding messages
+		Map<String, Object> params1 = new HashMap<>();
+		params1.put("key", "value1");
 		JSONRPCRequest message1 = new JSONRPCRequest(McpSchema.JSONRPC_VERSION, "method1", "id1",
-				Map.of("key", "value1"));
+				params1);
 
+		Map<String, Object> params2 = new HashMap<>();
+		params2.put("key", "value2");
 		JSONRPCRequest message2 = new JSONRPCRequest(McpSchema.JSONRPC_VERSION, "method2", "id2",
-				Map.of("key", "value2"));
+				params2);
 
 		// Verify both messages are processed
 		StepVerifier.create(transport.sendMessage(message1).then(transport.sendMessage(message2))).verifyComplete();
@@ -253,32 +254,26 @@ class HttpClientSseClientTransportTests {
 	@Test
 	void testMessageOrderPreservation() {
 		// Simulate receiving messages in a specific order
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "method": "first",
-				    "id": "1",
-				    "params": {"sequence": 1}
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"method\": \"first\",\n" +
+				"    \"id\": \"1\",\n" +
+				"    \"params\": {\"sequence\": 1}\n" +
+				"}");
 
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "method": "second",
-				    "id": "2",
-				    "params": {"sequence": 2}
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"method\": \"second\",\n" +
+				"    \"id\": \"2\",\n" +
+				"    \"params\": {\"sequence\": 2}\n" +
+				"}");
 
-		transport.simulateMessageEvent("""
-				{
-				    "jsonrpc": "2.0",
-				    "method": "third",
-				    "id": "3",
-				    "params": {"sequence": 3}
-				}
-				""");
+		transport.simulateMessageEvent("{\n" +
+				"    \"jsonrpc\": \"2.0\",\n" +
+				"    \"method\": \"third\",\n" +
+				"    \"id\": \"3\",\n" +
+				"    \"params\": {\"sequence\": 3}\n" +
+				"}");
 
 		// Verify message count and order
 		assertThat(transport.getInboundMessageCount()).isEqualTo(3);
