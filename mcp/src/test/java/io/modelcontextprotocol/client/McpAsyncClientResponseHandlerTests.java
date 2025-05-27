@@ -5,6 +5,9 @@
 package io.modelcontextprotocol.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -106,10 +109,15 @@ class McpAsyncClientResponseHandlerTests {
 		assertThat(asyncMcpClient.initialize().block()).isNotNull();
 
 		// Create a mock tools list that the server will return
-		Map<String, Object> inputSchema = Map.of("type", "object", "properties", Map.of(), "required", List.of());
+		Map<String, Object> inputSchema = new HashMap<>();
+		inputSchema.put("type", "object");
+		Map<String, Object> emptyProperties = new HashMap<>();
+		inputSchema.put("properties", emptyProperties);
+		inputSchema.put("required", Collections.emptyList());
 		McpSchema.Tool mockTool = new McpSchema.Tool("test-tool", "Test Tool Description",
 				new ObjectMapper().writeValueAsString(inputSchema));
-		McpSchema.ListToolsResult mockToolsResult = new McpSchema.ListToolsResult(List.of(mockTool), null);
+		List<McpSchema.Tool> toolsList = Collections.singletonList(mockTool);
+		McpSchema.ListToolsResult mockToolsResult = new McpSchema.ListToolsResult(toolsList, null);
 
 		// Simulate server sending tools/list_changed notification
 		McpSchema.JSONRPCNotification notification = new McpSchema.JSONRPCNotification(McpSchema.JSONRPC_VERSION,
@@ -153,8 +161,9 @@ class McpAsyncClientResponseHandlerTests {
 
 		McpSchema.JSONRPCResponse response = (McpSchema.JSONRPCResponse) sentMessage;
 		assertThat(response.id()).isEqualTo("test-id");
+		List<Root> rootsList = Collections.singletonList(new Root("file:///test/path", "test-root"));
 		assertThat(response.result())
-			.isEqualTo(new McpSchema.ListRootsResult(List.of(new Root("file:///test/path", "test-root"))));
+			.isEqualTo(new McpSchema.ListRootsResult(rootsList));
 		assertThat(response.error()).isNull();
 
 		asyncMcpClient.closeGracefully();
@@ -181,8 +190,8 @@ class McpAsyncClientResponseHandlerTests {
 		// Create a mock resources list that the server will return
 		McpSchema.Resource mockResource = new McpSchema.Resource("test://resource", "Test Resource", "A test resource",
 				"text/plain", null);
-		McpSchema.ListResourcesResult mockResourcesResult = new McpSchema.ListResourcesResult(List.of(mockResource),
-				null);
+		List<McpSchema.Resource> resourcesList = Collections.singletonList(mockResource);
+		McpSchema.ListResourcesResult mockResourcesResult = new McpSchema.ListResourcesResult(resourcesList, null);
 
 		// Simulate server sending resources/list_changed notification
 		McpSchema.JSONRPCNotification notification = new McpSchema.JSONRPCNotification(McpSchema.JSONRPC_VERSION,
@@ -223,9 +232,11 @@ class McpAsyncClientResponseHandlerTests {
 		assertThat(asyncMcpClient.initialize().block()).isNotNull();
 
 		// Create a mock prompts list that the server will return
-		McpSchema.Prompt mockPrompt = new McpSchema.Prompt("test-prompt", "Test Prompt Description",
-				List.of(new McpSchema.PromptArgument("arg1", "Test argument", true)));
-		McpSchema.ListPromptsResult mockPromptsResult = new McpSchema.ListPromptsResult(List.of(mockPrompt), null);
+		List<McpSchema.PromptArgument> promptArgs = Collections.singletonList(
+				new McpSchema.PromptArgument("arg1", "Test argument", true));
+		McpSchema.Prompt mockPrompt = new McpSchema.Prompt("test-prompt", "Test Prompt Description", promptArgs);
+		List<McpSchema.Prompt> promptsList = Collections.singletonList(mockPrompt);
+		McpSchema.ListPromptsResult mockPromptsResult = new McpSchema.ListPromptsResult(promptsList, null);
 
 		// Simulate server sending prompts/list_changed notification
 		McpSchema.JSONRPCNotification notification = new McpSchema.JSONRPCNotification(McpSchema.JSONRPC_VERSION,
@@ -270,8 +281,10 @@ class McpAsyncClientResponseHandlerTests {
 		assertThat(asyncMcpClient.initialize().block()).isNotNull();
 
 		// Create a mock create message request
-		var messageRequest = new McpSchema.CreateMessageRequest(
-				List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("Test message"))),
+		List<McpSchema.SamplingMessage> messages = Collections.singletonList(
+				new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("Test message")));
+		McpSchema.CreateMessageRequest messageRequest = new McpSchema.CreateMessageRequest(
+				messages,
 				null, // modelPreferences
 				"Test system prompt", McpSchema.CreateMessageRequest.ContextInclusionStrategy.NONE, 0.7, // temperature
 				100, // maxTokens
@@ -316,9 +329,10 @@ class McpAsyncClientResponseHandlerTests {
 		assertThat(asyncMcpClient.initialize().block()).isNotNull();
 
 		// Create a mock create message request
-		var messageRequest = new McpSchema.CreateMessageRequest(
-				List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("Test message"))),
-				null, null, null, null, 0, null, null);
+		List<McpSchema.SamplingMessage> messages = Collections.singletonList(
+				new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("Test message")));
+		McpSchema.CreateMessageRequest messageRequest = new McpSchema.CreateMessageRequest(
+				messages, null, null, null, null, 0, null, null);
 
 		// Simulate incoming request
 		McpSchema.JSONRPCRequest request = new McpSchema.JSONRPCRequest(McpSchema.JSONRPC_VERSION,
