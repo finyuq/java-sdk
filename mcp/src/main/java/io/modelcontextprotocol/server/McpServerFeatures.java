@@ -37,12 +37,23 @@ public class McpServerFeatures {
 	 * roots list changes
 	 * @param instructions The server instructions text
 	 */
-	record Async(McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities,
-			List<McpServerFeatures.AsyncToolSpecification> tools, Map<String, AsyncResourceSpecification> resources,
-			List<McpSchema.ResourceTemplate> resourceTemplates,
-			Map<String, McpServerFeatures.AsyncPromptSpecification> prompts,
-			List<BiFunction<McpAsyncServerExchange, List<McpSchema.Root>, Mono<Void>>> rootsChangeConsumers,
-			String instructions) {
+	public static class Async {
+
+		private final McpSchema.Implementation serverInfo;
+
+		private final McpSchema.ServerCapabilities serverCapabilities;
+
+		private final List<McpServerFeatures.AsyncToolSpecification> tools;
+
+		private final Map<String, AsyncResourceSpecification> resources;
+
+		private final List<McpSchema.ResourceTemplate> resourceTemplates;
+
+		private final Map<String, McpServerFeatures.AsyncPromptSpecification> prompts;
+
+		private final List<BiFunction<McpAsyncServerExchange, List<McpSchema.Root>, Mono<Void>>> rootsChangeConsumers;
+
+		private final String instructions;
 
 		/**
 		 * Create an instance and validate the arguments.
@@ -56,7 +67,7 @@ public class McpServerFeatures {
 		 * the roots list changes
 		 * @param instructions The server instructions text
 		 */
-		Async(McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities,
+		public Async(McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities,
 				List<McpServerFeatures.AsyncToolSpecification> tools, Map<String, AsyncResourceSpecification> resources,
 				List<McpSchema.ResourceTemplate> resourceTemplates,
 				Map<String, McpServerFeatures.AsyncPromptSpecification> prompts,
@@ -85,6 +96,38 @@ public class McpServerFeatures {
 			this.instructions = instructions;
 		}
 
+		public McpSchema.Implementation serverInfo() {
+			return serverInfo;
+		}
+
+		public McpSchema.ServerCapabilities serverCapabilities() {
+			return serverCapabilities;
+		}
+
+		public List<McpServerFeatures.AsyncToolSpecification> tools() {
+			return tools;
+		}
+
+		public Map<String, AsyncResourceSpecification> resources() {
+			return resources;
+		}
+
+		public List<McpSchema.ResourceTemplate> resourceTemplates() {
+			return resourceTemplates;
+		}
+
+		public Map<String, McpServerFeatures.AsyncPromptSpecification> prompts() {
+			return prompts;
+		}
+
+		public List<BiFunction<McpAsyncServerExchange, List<McpSchema.Root>, Mono<Void>>> rootsChangeConsumers() {
+			return rootsChangeConsumers;
+		}
+
+		public String instructions() {
+			return instructions;
+		}
+
 		/**
 		 * Convert a synchronous specification into an asynchronous one and provide
 		 * blocking code offloading to prevent accidental blocking of the non-blocking
@@ -93,7 +136,7 @@ public class McpServerFeatures {
 		 * @return a specification which is protected from blocking calls specified by the
 		 * user.
 		 */
-		static Async fromSync(Sync syncSpec) {
+		public static Async fromSync(Sync syncSpec) {
 			List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
 			for (var tool : syncSpec.tools()) {
 				tools.add(AsyncToolSpecification.fromSync(tool));
@@ -120,6 +163,38 @@ public class McpServerFeatures {
 			return new Async(syncSpec.serverInfo(), syncSpec.serverCapabilities(), tools, resources,
 					syncSpec.resourceTemplates(), prompts, rootChangeConsumers, syncSpec.instructions());
 		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			Async that = (Async) obj;
+			return java.util.Objects.equals(serverInfo, that.serverInfo)
+					&& java.util.Objects.equals(serverCapabilities, that.serverCapabilities)
+					&& java.util.Objects.equals(tools, that.tools)
+					&& java.util.Objects.equals(resources, that.resources)
+					&& java.util.Objects.equals(resourceTemplates, that.resourceTemplates)
+					&& java.util.Objects.equals(prompts, that.prompts)
+					&& java.util.Objects.equals(rootsChangeConsumers, that.rootsChangeConsumers)
+					&& java.util.Objects.equals(instructions, that.instructions);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(serverInfo, serverCapabilities, tools, resources, resourceTemplates, prompts,
+					rootsChangeConsumers, instructions);
+		}
+
+		@Override
+		public String toString() {
+			return "Async{" + "serverInfo=" + serverInfo + ", serverCapabilities=" + serverCapabilities + ", tools="
+					+ tools + ", resources=" + resources + ", resourceTemplates=" + resourceTemplates + ", prompts="
+					+ prompts + ", rootsChangeConsumers=" + rootsChangeConsumers + ", instructions='" + instructions
+					+ '\'' + '}';
+		}
+
 	}
 
 	/**
@@ -135,26 +210,25 @@ public class McpServerFeatures {
 	 * roots list changes
 	 * @param instructions The server instructions text
 	 */
-	record Sync(McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities,
-			List<McpServerFeatures.SyncToolSpecification> tools,
-			Map<String, McpServerFeatures.SyncResourceSpecification> resources,
-			List<McpSchema.ResourceTemplate> resourceTemplates,
-			Map<String, McpServerFeatures.SyncPromptSpecification> prompts,
-			List<BiConsumer<McpSyncServerExchange, List<McpSchema.Root>>> rootsChangeConsumers, String instructions) {
+	static class Sync {
 
-		/**
-		 * Create an instance and validate the arguments.
-		 * @param serverInfo The server implementation details
-		 * @param serverCapabilities The server capabilities
-		 * @param tools The list of tool specifications
-		 * @param resources The map of resource specifications
-		 * @param resourceTemplates The list of resource templates
-		 * @param prompts The map of prompt specifications
-		 * @param rootsChangeConsumers The list of consumers that will be notified when
-		 * the roots list changes
-		 * @param instructions The server instructions text
-		 */
-		Sync(McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities,
+		private final McpSchema.Implementation serverInfo;
+
+		private final McpSchema.ServerCapabilities serverCapabilities;
+
+		private final List<McpServerFeatures.SyncToolSpecification> tools;
+
+		private final Map<String, McpServerFeatures.SyncResourceSpecification> resources;
+
+		private final List<McpSchema.ResourceTemplate> resourceTemplates;
+
+		private final Map<String, McpServerFeatures.SyncPromptSpecification> prompts;
+
+		private final List<BiConsumer<McpSyncServerExchange, List<McpSchema.Root>>> rootsChangeConsumers;
+
+		private final String instructions;
+
+		public Sync(McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities,
 				List<McpServerFeatures.SyncToolSpecification> tools,
 				Map<String, McpServerFeatures.SyncResourceSpecification> resources,
 				List<McpSchema.ResourceTemplate> resourceTemplates,
@@ -182,6 +256,69 @@ public class McpServerFeatures {
 			this.prompts = (prompts != null) ? prompts : new HashMap<>();
 			this.rootsChangeConsumers = (rootsChangeConsumers != null) ? rootsChangeConsumers : new ArrayList<>();
 			this.instructions = instructions;
+		}
+
+		public McpSchema.Implementation serverInfo() {
+			return serverInfo;
+		}
+
+		public McpSchema.ServerCapabilities serverCapabilities() {
+			return serverCapabilities;
+		}
+
+		public List<McpServerFeatures.SyncToolSpecification> tools() {
+			return tools;
+		}
+
+		public Map<String, McpServerFeatures.SyncResourceSpecification> resources() {
+			return resources;
+		}
+
+		public List<McpSchema.ResourceTemplate> resourceTemplates() {
+			return resourceTemplates;
+		}
+
+		public Map<String, McpServerFeatures.SyncPromptSpecification> prompts() {
+			return prompts;
+		}
+
+		public List<BiConsumer<McpSyncServerExchange, List<McpSchema.Root>>> rootsChangeConsumers() {
+			return rootsChangeConsumers;
+		}
+
+		public String instructions() {
+			return instructions;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			Sync that = (Sync) obj;
+			return java.util.Objects.equals(serverInfo, that.serverInfo)
+					&& java.util.Objects.equals(serverCapabilities, that.serverCapabilities)
+					&& java.util.Objects.equals(tools, that.tools)
+					&& java.util.Objects.equals(resources, that.resources)
+					&& java.util.Objects.equals(resourceTemplates, that.resourceTemplates)
+					&& java.util.Objects.equals(prompts, that.prompts)
+					&& java.util.Objects.equals(rootsChangeConsumers, that.rootsChangeConsumers)
+					&& java.util.Objects.equals(instructions, that.instructions);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(serverInfo, serverCapabilities, tools, resources, resourceTemplates, prompts,
+					rootsChangeConsumers, instructions);
+		}
+
+		@Override
+		public String toString() {
+			return "Sync{" + "serverInfo=" + serverInfo + ", serverCapabilities=" + serverCapabilities + ", tools="
+					+ tools + ", resources=" + resources + ", resourceTemplates=" + resourceTemplates + ", prompts="
+					+ prompts + ", rootsChangeConsumers=" + rootsChangeConsumers + ", instructions='" + instructions
+					+ '\'' + '}';
 		}
 
 	}

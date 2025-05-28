@@ -123,7 +123,8 @@ public class McpClientSession implements McpSession {
 		// create child Observation and emit it together with the message to the
 		// consumer
 		this.connection = this.transport.connect(mono -> mono.doOnNext(message -> {
-			if (message instanceof McpSchema.JSONRPCResponse response) {
+			if (message instanceof McpSchema.JSONRPCResponse) {
+				McpSchema.JSONRPCResponse response = (McpSchema.JSONRPCResponse) message;
 				logger.debug("Received Response: {}", response);
 				var sink = pendingResponses.remove(response.id());
 				if (sink == null) {
@@ -133,7 +134,8 @@ public class McpClientSession implements McpSession {
 					sink.success(response);
 				}
 			}
-			else if (message instanceof McpSchema.JSONRPCRequest request) {
+			else if (message instanceof McpSchema.JSONRPCRequest) {
+				McpSchema.JSONRPCRequest request = (McpSchema.JSONRPCRequest) message;
 				logger.debug("Received request: {}", request);
 				handleIncomingRequest(request).subscribe(response -> transport.sendMessage(response).subscribe(),
 						error -> {
@@ -143,7 +145,8 @@ public class McpClientSession implements McpSession {
 							transport.sendMessage(errorResponse).subscribe();
 						});
 			}
-			else if (message instanceof McpSchema.JSONRPCNotification notification) {
+			else if (message instanceof McpSchema.JSONRPCNotification) {
+				McpSchema.JSONRPCNotification notification = (McpSchema.JSONRPCNotification) message;
 				logger.debug("Received notification: {}", notification);
 				handleIncomingNotification(notification).subscribe(null,
 						error -> logger.error("Error handling notification: {}", error.getMessage()));

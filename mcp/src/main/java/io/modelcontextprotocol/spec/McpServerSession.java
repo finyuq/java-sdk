@@ -152,7 +152,8 @@ public class McpServerSession implements McpSession {
 		return Mono.defer(() -> {
 			// TODO handle errors for communication to without initialization happening
 			// first
-			if (message instanceof McpSchema.JSONRPCResponse response) {
+			if (message instanceof McpSchema.JSONRPCResponse) {
+				McpSchema.JSONRPCResponse response = (McpSchema.JSONRPCResponse) message;
 				logger.debug("Received Response: {}", response);
 				var sink = pendingResponses.remove(response.id());
 				if (sink == null) {
@@ -163,7 +164,8 @@ public class McpServerSession implements McpSession {
 				}
 				return Mono.empty();
 			}
-			else if (message instanceof McpSchema.JSONRPCRequest request) {
+			else if (message instanceof McpSchema.JSONRPCRequest) {
+				McpSchema.JSONRPCRequest request = (McpSchema.JSONRPCRequest) message;
 				logger.debug("Received request: {}", request);
 				return handleIncomingRequest(request).onErrorResume(error -> {
 					var errorResponse = new McpSchema.JSONRPCResponse(McpSchema.JSONRPC_VERSION, request.id(), null,
@@ -173,7 +175,8 @@ public class McpServerSession implements McpSession {
 					return this.transport.sendMessage(errorResponse).then(Mono.empty());
 				}).flatMap(this.transport::sendMessage);
 			}
-			else if (message instanceof McpSchema.JSONRPCNotification notification) {
+			else if (message instanceof McpSchema.JSONRPCNotification) {
+				McpSchema.JSONRPCNotification notification = (McpSchema.JSONRPCNotification) message;
 				// TODO handle errors for communication to without initialization
 				// happening first
 				logger.debug("Received notification: {}", notification);

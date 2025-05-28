@@ -61,12 +61,23 @@ class McpClientFeatures {
 	 * @param loggingConsumers the logging consumers.
 	 * @param samplingHandler the sampling handler.
 	 */
-	record Async(McpSchema.Implementation clientInfo, McpSchema.ClientCapabilities clientCapabilities,
-			Map<String, McpSchema.Root> roots, List<Function<List<McpSchema.Tool>, Mono<Void>>> toolsChangeConsumers,
-			List<Function<List<McpSchema.Resource>, Mono<Void>>> resourcesChangeConsumers,
-			List<Function<List<McpSchema.Prompt>, Mono<Void>>> promptsChangeConsumers,
-			List<Function<McpSchema.LoggingMessageNotification, Mono<Void>>> loggingConsumers,
-			Function<McpSchema.CreateMessageRequest, Mono<McpSchema.CreateMessageResult>> samplingHandler) {
+	public static class Async {
+
+		private final McpSchema.Implementation clientInfo;
+
+		private final McpSchema.ClientCapabilities clientCapabilities;
+
+		private final Map<String, McpSchema.Root> roots;
+
+		private final List<Function<List<McpSchema.Tool>, Mono<Void>>> toolsChangeConsumers;
+
+		private final List<Function<List<McpSchema.Resource>, Mono<Void>>> resourcesChangeConsumers;
+
+		private final List<Function<List<McpSchema.Prompt>, Mono<Void>>> promptsChangeConsumers;
+
+		private final List<Function<McpSchema.LoggingMessageNotification, Mono<Void>>> loggingConsumers;
+
+		private final Function<McpSchema.CreateMessageRequest, Mono<McpSchema.CreateMessageResult>> samplingHandler;
 
 		/**
 		 * Create an instance and validate the arguments.
@@ -99,6 +110,38 @@ class McpClientFeatures {
 			this.promptsChangeConsumers = promptsChangeConsumers != null ? promptsChangeConsumers : List.of();
 			this.loggingConsumers = loggingConsumers != null ? loggingConsumers : List.of();
 			this.samplingHandler = samplingHandler;
+		}
+
+		public McpSchema.Implementation clientInfo() {
+			return clientInfo;
+		}
+
+		public McpSchema.ClientCapabilities clientCapabilities() {
+			return clientCapabilities;
+		}
+
+		public Map<String, McpSchema.Root> roots() {
+			return roots;
+		}
+
+		public List<Function<List<McpSchema.Tool>, Mono<Void>>> toolsChangeConsumers() {
+			return toolsChangeConsumers;
+		}
+
+		public List<Function<List<McpSchema.Resource>, Mono<Void>>> resourcesChangeConsumers() {
+			return resourcesChangeConsumers;
+		}
+
+		public List<Function<List<McpSchema.Prompt>, Mono<Void>>> promptsChangeConsumers() {
+			return promptsChangeConsumers;
+		}
+
+		public List<Function<McpSchema.LoggingMessageNotification, Mono<Void>>> loggingConsumers() {
+			return loggingConsumers;
+		}
+
+		public Function<McpSchema.CreateMessageRequest, Mono<McpSchema.CreateMessageResult>> samplingHandler() {
+			return samplingHandler;
 		}
 
 		/**
@@ -142,6 +185,38 @@ class McpClientFeatures {
 					toolsChangeConsumers, resourcesChangeConsumers, promptsChangeConsumers, loggingConsumers,
 					samplingHandler);
 		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			Async that = (Async) obj;
+			return java.util.Objects.equals(clientInfo, that.clientInfo)
+					&& java.util.Objects.equals(clientCapabilities, that.clientCapabilities)
+					&& java.util.Objects.equals(roots, that.roots)
+					&& java.util.Objects.equals(toolsChangeConsumers, that.toolsChangeConsumers)
+					&& java.util.Objects.equals(resourcesChangeConsumers, that.resourcesChangeConsumers)
+					&& java.util.Objects.equals(promptsChangeConsumers, that.promptsChangeConsumers)
+					&& java.util.Objects.equals(loggingConsumers, that.loggingConsumers)
+					&& java.util.Objects.equals(samplingHandler, that.samplingHandler);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(clientInfo, clientCapabilities, roots, toolsChangeConsumers,
+					resourcesChangeConsumers, promptsChangeConsumers, loggingConsumers, samplingHandler);
+		}
+
+		@Override
+		public String toString() {
+			return "Async{" + "clientInfo=" + clientInfo + ", clientCapabilities=" + clientCapabilities + ", roots="
+					+ roots + ", toolsChangeConsumers=" + toolsChangeConsumers + ", resourcesChangeConsumers="
+					+ resourcesChangeConsumers + ", promptsChangeConsumers=" + promptsChangeConsumers
+					+ ", loggingConsumers=" + loggingConsumers + ", samplingHandler=" + samplingHandler + '}';
+		}
+
 	}
 
 	/**
@@ -157,12 +232,23 @@ class McpClientFeatures {
 	 * @param loggingConsumers the logging consumers.
 	 * @param samplingHandler the sampling handler.
 	 */
-	public record Sync(McpSchema.Implementation clientInfo, McpSchema.ClientCapabilities clientCapabilities,
-			Map<String, McpSchema.Root> roots, List<Consumer<List<McpSchema.Tool>>> toolsChangeConsumers,
-			List<Consumer<List<McpSchema.Resource>>> resourcesChangeConsumers,
-			List<Consumer<List<McpSchema.Prompt>>> promptsChangeConsumers,
-			List<Consumer<McpSchema.LoggingMessageNotification>> loggingConsumers,
-			Function<McpSchema.CreateMessageRequest, McpSchema.CreateMessageResult> samplingHandler) {
+	public static class Sync {
+
+		private final McpSchema.Implementation clientInfo;
+
+		private final McpSchema.ClientCapabilities clientCapabilities;
+
+		private final Map<String, McpSchema.Root> roots;
+
+		private final List<Consumer<List<McpSchema.Tool>>> toolsChangeConsumers;
+
+		private final List<Consumer<List<McpSchema.Resource>>> resourcesChangeConsumers;
+
+		private final List<Consumer<List<McpSchema.Prompt>>> promptsChangeConsumers;
+
+		private final List<Consumer<McpSchema.LoggingMessageNotification>> loggingConsumers;
+
+		private final Function<McpSchema.CreateMessageRequest, McpSchema.CreateMessageResult> samplingHandler;
 
 		/**
 		 * Create an instance and validate the arguments.
@@ -196,6 +282,70 @@ class McpClientFeatures {
 			this.loggingConsumers = loggingConsumers != null ? loggingConsumers : List.of();
 			this.samplingHandler = samplingHandler;
 		}
+
+		public McpSchema.Implementation clientInfo() {
+			return clientInfo;
+		}
+
+		public McpSchema.ClientCapabilities clientCapabilities() {
+			return clientCapabilities;
+		}
+
+		public Map<String, McpSchema.Root> roots() {
+			return roots;
+		}
+
+		public List<Consumer<List<McpSchema.Tool>>> toolsChangeConsumers() {
+			return toolsChangeConsumers;
+		}
+
+		public List<Consumer<List<McpSchema.Resource>>> resourcesChangeConsumers() {
+			return resourcesChangeConsumers;
+		}
+
+		public List<Consumer<List<McpSchema.Prompt>>> promptsChangeConsumers() {
+			return promptsChangeConsumers;
+		}
+
+		public List<Consumer<McpSchema.LoggingMessageNotification>> loggingConsumers() {
+			return loggingConsumers;
+		}
+
+		public Function<McpSchema.CreateMessageRequest, McpSchema.CreateMessageResult> samplingHandler() {
+			return samplingHandler;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			Sync that = (Sync) obj;
+			return java.util.Objects.equals(clientInfo, that.clientInfo)
+					&& java.util.Objects.equals(clientCapabilities, that.clientCapabilities)
+					&& java.util.Objects.equals(roots, that.roots)
+					&& java.util.Objects.equals(toolsChangeConsumers, that.toolsChangeConsumers)
+					&& java.util.Objects.equals(resourcesChangeConsumers, that.resourcesChangeConsumers)
+					&& java.util.Objects.equals(promptsChangeConsumers, that.promptsChangeConsumers)
+					&& java.util.Objects.equals(loggingConsumers, that.loggingConsumers)
+					&& java.util.Objects.equals(samplingHandler, that.samplingHandler);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(clientInfo, clientCapabilities, roots, toolsChangeConsumers,
+					resourcesChangeConsumers, promptsChangeConsumers, loggingConsumers, samplingHandler);
+		}
+
+		@Override
+		public String toString() {
+			return "Sync{" + "clientInfo=" + clientInfo + ", clientCapabilities=" + clientCapabilities + ", roots="
+					+ roots + ", toolsChangeConsumers=" + toolsChangeConsumers + ", resourcesChangeConsumers="
+					+ resourcesChangeConsumers + ", promptsChangeConsumers=" + promptsChangeConsumers
+					+ ", loggingConsumers=" + loggingConsumers + ", samplingHandler=" + samplingHandler + '}';
+		}
+
 	}
 
 }

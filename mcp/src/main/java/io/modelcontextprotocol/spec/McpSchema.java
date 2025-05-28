@@ -129,8 +129,7 @@ public final class McpSchema {
 
 	}
 
-	public sealed interface Request
-			permits InitializeRequest, CallToolRequest, CreateMessageRequest, CompleteRequest, GetPromptRequest {
+	public interface Request {
 
 	}
 
@@ -171,7 +170,7 @@ public final class McpSchema {
 	// ---------------------------
 	// JSON-RPC Message Types
 	// ---------------------------
-	public sealed interface JSONRPCMessage permits JSONRPCRequest, JSONRPCNotification, JSONRPCResponse {
+	public interface JSONRPCMessage {
 
 		String jsonrpc();
 
@@ -179,57 +178,371 @@ public final class McpSchema {
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record JSONRPCRequest( // @formatter:off
-			@JsonProperty("jsonrpc") String jsonrpc,
-			@JsonProperty("method") String method,
-			@JsonProperty("id") Object id,
-			@JsonProperty("params") Object params) implements JSONRPCMessage {
-	} // @formatter:on
+	public static class JSONRPCRequest implements JSONRPCMessage {
+
+		@JsonProperty("jsonrpc")
+		private final String jsonrpc;
+
+		@JsonProperty("method")
+		private final String method;
+
+		@JsonProperty("id")
+		private final Object id;
+
+		@JsonProperty("params")
+		private final Object params;
+
+		public JSONRPCRequest(@JsonProperty("jsonrpc") String jsonrpc, @JsonProperty("method") String method,
+				@JsonProperty("id") Object id, @JsonProperty("params") Object params) {
+			this.jsonrpc = jsonrpc;
+			this.method = method;
+			this.id = id;
+			this.params = params;
+		}
+
+		public String jsonrpc() {
+			return jsonrpc;
+		}
+
+		public String method() {
+			return method;
+		}
+
+		public Object id() {
+			return id;
+		}
+
+		public Object params() {
+			return params;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			JSONRPCRequest that = (JSONRPCRequest) obj;
+			return java.util.Objects.equals(jsonrpc, that.jsonrpc) && java.util.Objects.equals(method, that.method)
+					&& java.util.Objects.equals(id, that.id) && java.util.Objects.equals(params, that.params);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(jsonrpc, method, id, params);
+		}
+
+		@Override
+		public String toString() {
+			return "JSONRPCRequest{" + "jsonrpc='" + jsonrpc + '\'' + ", method='" + method + '\'' + ", id=" + id
+					+ ", params=" + params + '}';
+		}
+
+	}
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record JSONRPCNotification( // @formatter:off
-			@JsonProperty("jsonrpc") String jsonrpc,
-			@JsonProperty("method") String method,
-			@JsonProperty("params") Object params) implements JSONRPCMessage {
-	} // @formatter:on
+	public static class JSONRPCNotification implements JSONRPCMessage {
+
+		@JsonProperty("jsonrpc")
+		private final String jsonrpc;
+
+		@JsonProperty("method")
+		private final String method;
+
+		@JsonProperty("params")
+		private final Object params;
+
+		public JSONRPCNotification(@JsonProperty("jsonrpc") String jsonrpc, @JsonProperty("method") String method,
+				@JsonProperty("params") Object params) {
+			this.jsonrpc = jsonrpc;
+			this.method = method;
+			this.params = params;
+		}
+
+		public String jsonrpc() {
+			return jsonrpc;
+		}
+
+		public String method() {
+			return method;
+		}
+
+		public Object params() {
+			return params;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			JSONRPCNotification that = (JSONRPCNotification) obj;
+			return java.util.Objects.equals(jsonrpc, that.jsonrpc) && java.util.Objects.equals(method, that.method)
+					&& java.util.Objects.equals(params, that.params);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(jsonrpc, method, params);
+		}
+
+		@Override
+		public String toString() {
+			return "JSONRPCNotification{" + "jsonrpc='" + jsonrpc + '\'' + ", method='" + method + '\'' + ", params="
+					+ params + '}';
+		}
+
+	}
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record JSONRPCResponse( // @formatter:off
-			@JsonProperty("jsonrpc") String jsonrpc,
-			@JsonProperty("id") Object id,
-			@JsonProperty("result") Object result,
-			@JsonProperty("error") JSONRPCError error) implements JSONRPCMessage {
+	public static class JSONRPCResponse implements JSONRPCMessage {
+
+		@JsonProperty("jsonrpc")
+		private final String jsonrpc;
+
+		@JsonProperty("id")
+		private final Object id;
+
+		@JsonProperty("result")
+		private final Object result;
+
+		@JsonProperty("error")
+		private final JSONRPCError error;
+
+		public JSONRPCResponse(@JsonProperty("jsonrpc") String jsonrpc, @JsonProperty("id") Object id,
+				@JsonProperty("result") Object result, @JsonProperty("error") JSONRPCError error) {
+			this.jsonrpc = jsonrpc;
+			this.id = id;
+			this.result = result;
+			this.error = error;
+		}
+
+		public String jsonrpc() {
+			return jsonrpc;
+		}
+
+		public Object id() {
+			return id;
+		}
+
+		public Object result() {
+			return result;
+		}
+
+		public JSONRPCError error() {
+			return error;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			JSONRPCResponse that = (JSONRPCResponse) obj;
+			return java.util.Objects.equals(jsonrpc, that.jsonrpc) && java.util.Objects.equals(id, that.id)
+					&& java.util.Objects.equals(result, that.result) && java.util.Objects.equals(error, that.error);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(jsonrpc, id, result, error);
+		}
+
+		@Override
+		public String toString() {
+			return "JSONRPCResponse{" + "jsonrpc='" + jsonrpc + '\'' + ", id=" + id + ", result=" + result + ", error="
+					+ error + '}';
+		}
 
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)
 		@JsonIgnoreProperties(ignoreUnknown = true)
-		public record JSONRPCError(
-			@JsonProperty("code") int code,
-			@JsonProperty("message") String message,
-			@JsonProperty("data") Object data) {
+		public static class JSONRPCError {
+
+			@JsonProperty("code")
+			private final int code;
+
+			@JsonProperty("message")
+			private final String message;
+
+			@JsonProperty("data")
+			private final Object data;
+
+			public JSONRPCError(@JsonProperty("code") int code, @JsonProperty("message") String message,
+					@JsonProperty("data") Object data) {
+				this.code = code;
+				this.message = message;
+				this.data = data;
+			}
+
+			public int code() {
+				return code;
+			}
+
+			public String message() {
+				return message;
+			}
+
+			public Object data() {
+				return data;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null || getClass() != obj.getClass())
+					return false;
+				JSONRPCError that = (JSONRPCError) obj;
+				return code == that.code && java.util.Objects.equals(message, that.message)
+						&& java.util.Objects.equals(data, that.data);
+			}
+
+			@Override
+			public int hashCode() {
+				return java.util.Objects.hash(code, message, data);
+			}
+
+			@Override
+			public String toString() {
+				return "JSONRPCError{" + "code=" + code + ", message='" + message + '\'' + ", data=" + data + '}';
+			}
+
 		}
-	}// @formatter:on
+
+	}
 
 	// ---------------------------
 	// Initialization
 	// ---------------------------
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record InitializeRequest( // @formatter:off
-		@JsonProperty("protocolVersion") String protocolVersion,
-		@JsonProperty("capabilities") ClientCapabilities capabilities,
-		@JsonProperty("clientInfo") Implementation clientInfo) implements Request {		
-	} // @formatter:on
+	public static class InitializeRequest implements Request {
+
+		@JsonProperty("protocolVersion")
+		private final String protocolVersion;
+
+		@JsonProperty("capabilities")
+		private final ClientCapabilities capabilities;
+
+		@JsonProperty("clientInfo")
+		private final Implementation clientInfo;
+
+		public InitializeRequest(@JsonProperty("protocolVersion") String protocolVersion,
+				@JsonProperty("capabilities") ClientCapabilities capabilities,
+				@JsonProperty("clientInfo") Implementation clientInfo) {
+			this.protocolVersion = protocolVersion;
+			this.capabilities = capabilities;
+			this.clientInfo = clientInfo;
+		}
+
+		public String protocolVersion() {
+			return protocolVersion;
+		}
+
+		public ClientCapabilities capabilities() {
+			return capabilities;
+		}
+
+		public Implementation clientInfo() {
+			return clientInfo;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			InitializeRequest that = (InitializeRequest) obj;
+			return java.util.Objects.equals(protocolVersion, that.protocolVersion)
+					&& java.util.Objects.equals(capabilities, that.capabilities)
+					&& java.util.Objects.equals(clientInfo, that.clientInfo);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(protocolVersion, capabilities, clientInfo);
+		}
+
+		@Override
+		public String toString() {
+			return "InitializeRequest{" + "protocolVersion='" + protocolVersion + '\'' + ", capabilities="
+					+ capabilities + ", clientInfo=" + clientInfo + '}';
+		}
+
+	}
 
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public record InitializeResult( // @formatter:off
-		@JsonProperty("protocolVersion") String protocolVersion,
-		@JsonProperty("capabilities") ServerCapabilities capabilities,
-		@JsonProperty("serverInfo") Implementation serverInfo,
-		@JsonProperty("instructions") String instructions) {
-	} // @formatter:on
+	public static class InitializeResult {
+
+		@JsonProperty("protocolVersion")
+		private final String protocolVersion;
+
+		@JsonProperty("capabilities")
+		private final ServerCapabilities capabilities;
+
+		@JsonProperty("serverInfo")
+		private final Implementation serverInfo;
+
+		@JsonProperty("instructions")
+		private final String instructions;
+
+		public InitializeResult(@JsonProperty("protocolVersion") String protocolVersion,
+				@JsonProperty("capabilities") ServerCapabilities capabilities,
+				@JsonProperty("serverInfo") Implementation serverInfo,
+				@JsonProperty("instructions") String instructions) {
+			this.protocolVersion = protocolVersion;
+			this.capabilities = capabilities;
+			this.serverInfo = serverInfo;
+			this.instructions = instructions;
+		}
+
+		public String protocolVersion() {
+			return protocolVersion;
+		}
+
+		public ServerCapabilities capabilities() {
+			return capabilities;
+		}
+
+		public Implementation serverInfo() {
+			return serverInfo;
+		}
+
+		public String instructions() {
+			return instructions;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			InitializeResult that = (InitializeResult) obj;
+			return java.util.Objects.equals(protocolVersion, that.protocolVersion)
+					&& java.util.Objects.equals(capabilities, that.capabilities)
+					&& java.util.Objects.equals(serverInfo, that.serverInfo)
+					&& java.util.Objects.equals(instructions, that.instructions);
+		}
+
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(protocolVersion, capabilities, serverInfo, instructions);
+		}
+
+		@Override
+		public String toString() {
+			return "InitializeResult{" + "protocolVersion='" + protocolVersion + '\'' + ", capabilities=" + capabilities
+					+ ", serverInfo=" + serverInfo + ", instructions='" + instructions + '\'' + '}';
+		}
+
+	}
 
 	/**
 	 * Clients can implement additional features to enrich connected MCP servers with
@@ -263,8 +576,37 @@ public final class McpSchema {
 		 */
 		@JsonInclude(JsonInclude.Include.NON_ABSENT)
 		@JsonIgnoreProperties(ignoreUnknown = true)	
-		public record RootCapabilities(
-			@JsonProperty("listChanged") Boolean listChanged) {
+		public static class RootCapabilities {
+			@JsonProperty("listChanged")
+			private final Boolean listChanged;
+
+			public RootCapabilities(@JsonProperty("listChanged") Boolean listChanged) {
+				this.listChanged = listChanged;
+			}
+
+			public Boolean listChanged() {
+				return listChanged;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj) return true;
+				if (obj == null || getClass() != obj.getClass()) return false;
+				RootCapabilities that = (RootCapabilities) obj;
+				return java.util.Objects.equals(listChanged, that.listChanged);
+			}
+
+			@Override
+			public int hashCode() {
+				return java.util.Objects.hash(listChanged);
+			}
+
+			@Override
+			public String toString() {
+				return "RootCapabilities{" +
+						"listChanged=" + listChanged +
+						'}';
+			}
 		}
 
 		/**
@@ -530,7 +872,7 @@ public final class McpSchema {
 	@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, include = As.PROPERTY)
 	@JsonSubTypes({ @JsonSubTypes.Type(value = TextResourceContents.class, name = "text"),
 			@JsonSubTypes.Type(value = BlobResourceContents.class, name = "blob") })
-	public sealed interface ResourceContents permits TextResourceContents, BlobResourceContents {
+	public interface ResourceContents {
 
 		/**
 		 * The URI of this resource.
@@ -1174,7 +1516,7 @@ public final class McpSchema {
 	// Autocomplete
 	// ---------------------------
 	public record CompleteRequest(PromptOrResourceReference ref, CompleteArgument argument) implements Request {
-		public sealed interface PromptOrResourceReference permits PromptReference, ResourceReference {
+		public interface PromptOrResourceReference {
 
 			String type();
 
@@ -1211,7 +1553,7 @@ public final class McpSchema {
 	@JsonSubTypes({ @JsonSubTypes.Type(value = TextContent.class, name = "text"),
 			@JsonSubTypes.Type(value = ImageContent.class, name = "image"),
 			@JsonSubTypes.Type(value = EmbeddedResource.class, name = "resource") })
-	public sealed interface Content permits TextContent, ImageContent, EmbeddedResource {
+	public interface Content {
 
 		default String type() {
 			if (this instanceof TextContent) {
